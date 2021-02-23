@@ -4,6 +4,7 @@ source("Scripts/99_dependencies.R")
 stratified <- read_excel("Data/Data.xlsx",sheet = "Strat_change") #Load stratified data
 
 ## Plot themes
+##lkjasdlkajsd
 theme<- theme_classic()+
   theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
         axis.title.x=element_text(size=8),
