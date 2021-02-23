@@ -1,0 +1,79 @@
+---
+title: "polymod_setting"
+author: "Carol Liu"
+date: "1/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(socialmixr)
+library(dplyr)
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Germany
+```{r}
+data(polymod)
+cont_base <- polymod$participants %>% filter(country=="Germany", part_age>18)
+avg_setting_base <- cont_base %>% left_join(polymod$contacts %>% group_by(part_id) %>%
+                                  summarize(cnt_tot = n(),
+                                            cnt_home = sum(cnt_home,na.rm=T),
+                                            cnt_work = sum(cnt_work, na.rm=T),
+                                            cnt_school = sum(cnt_school, na.rm=T)),
+                                  by="part_id") %>%
+                                  mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+                                         
+
+avg_setting_base %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other))
+```
+
+## Italy
+```{r}
+cont_base <- polymod$participants %>% filter(country=="Italy", part_age>18)
+avg_setting_base <- cont_base %>% left_join(polymod$contacts %>% group_by(part_id) %>%
+                                  summarize(cnt_tot = n(),
+                                            cnt_home = sum(cnt_home,na.rm=T),
+                                            cnt_work = sum(cnt_work, na.rm=T),
+                                            cnt_school = sum(cnt_school, na.rm=T)),
+                                  by="part_id") %>%
+                                  mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+                                         
+
+avg_setting_base %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other))
+```
+
+## Netherlands
+```{r}
+cont_base <- polymod$participants %>% filter(country=="Netherlands", part_age>18)
+avg_setting_base <- cont_base %>% left_join(polymod$contacts %>% group_by(part_id) %>%
+                                  summarize(cnt_tot = n(),
+                                            cnt_home = sum(cnt_home,na.rm=T),
+                                            cnt_work = sum(cnt_work, na.rm=T),
+                                            cnt_school = sum(cnt_school, na.rm=T)),
+                                  by="part_id") %>%
+                                  mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+                                         
+
+avg_setting_base %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other))
+```
+

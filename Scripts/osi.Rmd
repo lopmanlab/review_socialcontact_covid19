@@ -1,0 +1,322 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
+
+```{r}
+source("99_dependencies.R")
+studyperiod <- read.csv("studyperiod.csv")
+
+tab_names <- excel_sheets("../Data/OxCGRT_timeseries_all.xlsx")
+list_all <- lapply(tab_names, function(x) read_excel(path = "../Data/OxCGRT_timeseries_all.xlsx", sheet = x))
+
+list_all1<-lapply(list_all, function(x) 
+                    x%>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA","ZAF")) %>% select(1:366) %>%  gather(date, value, '01Jan2020':'29Dec2020') %>%
+mutate(date1 = rep(as.Date("2020-01-01"):as.Date("2020-12-29"), each =12),
+date1 = as.Date(date1, origin = "1970-01-01"),
+week = rep(1:52, each =84)))
+
+for (i in 1:length(tab_names)){
+  list_all1[[i]]$index <- rep(tab_names[[i]])
+}
+
+allindex <- do.call(rbind.data.frame, list_all1)
+
+allindex_week <- allindex %>% group_by(country_name, week, index) %>% summarize(value = max(value))
+# Flag =0 means they are geographically targeted
+
+allindex_week$flags <- ifelse(grepl("flag", allindex_week$index), "flag","metric")
+allindex_week$subs = substr(allindex_week$index, start=1, stop=2)
+
+index <- data.frame(subs = c("c1","c2","c3","c4","c5","c6","c7","c8","st"),
+                    index = c("School closing","Workplace closing","Cancel public events","Restrict gatherings",
+                              "Close public transport","Stay at home","Restrict movement","International travel controls","Stringency index"))
+  
+allindex_week <- allindex_week %>% select(-index) %>% pivot_wider(names_from = flags, values_from = value, values_fill=NA, values_fn = sum) %>% 
+  filter(subs %in% c("c1","c2","c3","c4","c5","c6","c7","st")) %>%
+  mutate(flag_bin = flag,
+          flag_bin = na_if(flag_bin, 1)) %>%
+  left_join(index, by = "subs")
+
+
+
+```
+## Themes   
+```{r}
+theme<- theme_classic()+
+  theme(plot.title = element_text(hjust=0.5, face="bold",size=9),
+        axis.title=element_text(size=8),
+        axis.text = element_text(size=8),
+        legend.title = element_text(size=6),
+        legend.text = element_text(size =6),
+        legend.key.size = unit(0.5, "lines"),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.y=element_blank(),
+        panel.grid.major.x=element_line(),
+        panel.border=element_blank())
+
+theme_sp<-  theme_minimal()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=8),
+              axis.title.x=element_text(size=7),
+             legend.text = element_text(size =7),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              panel.grid.major.x=element_line(),
+              axis.ticks=element_blank(),
+              legend.position="none",
+              panel.border=element_blank(),
+              legend.title=element_blank())
+
+```
+
+
+## Individual plots for measures
+```{r}
+osi <- list()   ##plot list for OSI
+sp <- list()    ##plot list for study period
+comb<- list()
+
+for (i in 1: length(unique(allindex_week$country_name))){
+
+osi[[i]] <- allindex_week %>% 
+              filter(subs!= "st" & country_name == unique(allindex_week$country_name)[[i]]) %>%
+              filter(week <44) %>%
+              ggplot(aes(x=week, y=index)) + 
+              geom_tile(color="white", size=0.1, aes(fill = metric)) +
+              geom_text(aes(label = round(flag_bin)), size=3)+
+              scale_fill_continuous(type = "viridis", 
+                        breaks = c(0, 3), 
+                        labels = c("None", "Strict"))+
+              xlim(1,52)+
+              scale_x_continuous(expand = c(0, 0),
+                                 breaks = c(1,5,9,13,18,22,26.5,31,35,39), 
+                                  labels=c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct"))+
+              scale_y_discrete(position="right")+
+              xlab("") + ylab("") + ggtitle(paste(unique(allindex_week$country_name)[[i]])) + theme +
+        guides(shape = guide_legend(override.aes = list(size = 0.5)),
+               color = guide_legend(override.aes = list(size = 0.5)))
+sp[[i]] <- studyperiod %>%
+        filter(country_name == unique(allindex_week$country_name)[[i]]) %>%
+        filter(week <44) %>%
+        ggplot(aes(x=week, y= index))+
+        geom_tile(color="white", size=0.1, aes(fill = factor(metric))) + 
+        scale_fill_manual(values = c("white","black","grey60","#C6DBEF"), labels=c("","Stringent measures","1-month post-relax","2+ month post-relax"))+
+        scale_x_continuous(expand = c(0, 0),
+                          breaks = c(1,5,9,13,18,22,26.5,31,35,39), 
+                          labels=c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct"))+
+        scale_y_discrete(position="right")+
+        theme_sp +xlab("Data collection periods") + ylab("")
+
+blank <- grid.rect(gp=gpar(col="white"))
+
+comb[[i]] <- grid.arrange(osi[[i]],sp[[i]], blank,
+             layout_matrix = rbind(c(1,1,1,1),
+                                   c(1,1,1,1),
+                                   c(1,1,1,1),
+                                   c(2,2,2,3)))
+
+}
+
+lay <- rbind(c(1,1,1,1,1,1,1),
+            c(1,1,1,1,1,1,1),
+            c(1,1,1,1,1,1,1),
+             c(1,1,1,1,1,1,1),
+            c(2,2,2,2,2,2,3))
+
+for (i in 1: length(osi)){
+  png(paste("../Plot/osi/osi",i,".png",sep=""),height = 4,width = 7, units = 'in',res=600)
+  grid.arrange(osi[[i]],sp[[i]], blank, 
+             layout_matrix = lay)
+  dev.off()
+}
+
+
+```
+
+
+## OSI and average contacts
+```{r}
+stratified <- read_excel("../Data/Data.xlsx",sheet = "Strat_change")
+sp <- read.csv("studyperiod1.csv")
+
+stratified <- stratified %>% select(-Article,-ss_precovid,-ss_lckdown,-ss_post) %>%                     
+  pivot_longer(cols = mean_precovid:'95hi_post2', 
+                            names_to = "measure",values_to="value") %>%
+              select(SN, Authors, region_study, name, Strata, strata_cat, measure,value)
+
+stratified <- stratified %>%
+              mutate(period = sub(".*_", "", stratified$measure),
+                     metric = sub("_.*", "", stratified$measure),
+                     country_name = gsub("_.*| .*|-.*","", stratified$region_study),
+                     country_study = gsub(" .*","", stratified$region_study),
+                     country_name = replace(country_name, country_name == "US","United States"),
+                     country_name = replace(country_name, country_name == "UK", "United Kingdom"),
+                     country_name = replace(country_name, country_name == "South", "South Africa"),
+                     country_study = replace(country_study, country_study == "South", "South Africa"))%>%
+              left_join(data.frame(period = c("precovid","lckdown","post","post2"),
+                                   period_num = as.character(c(99,1,2,3))), by ="period") 
+sp <- sp %>% mutate(metric = as.character(metric))
+
+strat_time <- stratified%>%
+  left_join(sp, by=c("country_study"="country_study","period_num"="metric")) %>% 
+  select(-country_name.x) %>%
+                  rename("country_name"="country_name.y") %>% 
+  group_by(country_study, Strata, strata_cat, value, period, metric) %>%
+  summarize(week = mean(week)) %>%
+  
+strat_time %>% filter(country_study == "South Africa")
+
+unique(strat_time$country_study)
+
+```
+
+## Average contacts by age over time
+```{r}
+strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study !="Netherlands_Bak"& country_study !="Spain")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)))+ facet_wrap(~country_study)+
+     ylim(0,10)+theme
+  
+p1 <- strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study == "Belgium_Col")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)), size=0.8) + 
+      geom_point(aes(x=week, y=value, col = factor(strata_cat)), size=1.5)+
+      scale_colour_viridis(discrete=T)+
+      geom_line(data = allindex_week %>% filter(subs == "st", country_name == "Belgium"), aes(x=week, y=metric/5))+
+      scale_y_continuous("Mean contacts", sec.axis = sec_axis(trans=~.*5, name = "Stringency index")) + theme+ggtitle("Belgium")
+
+p2 <- strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study == "China-Shanghai" & period != "precovid")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)), size=0.8) + 
+      geom_point(aes(x=week, y=value, col = factor(strata_cat)), size=1.5)+
+      scale_colour_viridis(discrete=T)+
+      geom_line(data = allindex_week %>% filter(subs == "st", country_name == "China"), aes(x=week, y=metric/5))+
+      scale_y_continuous("Mean contacts", sec.axis = sec_axis(trans=~.*5, name = "Stringency index")) + theme+ ggtitle("China-Shanghai")
+
+p3 <- strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study == "China-Wuhan")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)), size=0.8) + 
+      geom_point(aes(x=week, y=value, col = factor(strata_cat)), size=1.5)+
+      scale_colour_viridis(discrete=T)+
+      geom_line(data = allindex_week %>% filter(subs == "st", country_name == "China"), aes(x=week, y=metric/5))+
+      scale_y_continuous("Mean contacts", sec.axis = sec_axis(trans=~.*5, name = "Stringency index")) + theme +
+ggtitle("China-Wuhan")
+
+p4<- strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study == "Luxembourg")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)), size=0.8) + 
+      geom_point(aes(x=week, y=value, col = factor(strata_cat)), size=1.5)+
+      scale_colour_viridis(discrete=T)+
+      geom_line(data = allindex_week %>% filter(subs == "st", country_name == "Luxembourg"), aes(x=week, y=metric/5))+
+      scale_y_continuous("Mean contacts", sec.axis = sec_axis(trans=~.*5, name = "Stringency index")) + theme+
+ggtitle("Luxembourg")
+
+p5<- strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study == "Netherlands_Bak")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)), size=0.8) + 
+      geom_point(aes(x=week, y=value, col = factor(strata_cat)), size=1.5)+      
+      scale_colour_viridis(discrete=T)+
+      geom_line(data = allindex_week %>% filter(subs == "st", country_name == "Netherlands"), aes(x=week, y=metric/2))+
+      scale_y_continuous("Mean contacts", sec.axis = sec_axis(trans=~.*2, name = "Stringency index")) + theme+
+ggtitle("Netherlands")
+
+p6<- strat_time%>% filter(Strata=="age" & metric=="mean" &!is.na(value) & country_study == "US")%>%
+      ggplot(aes(x=week, y=value)) + geom_line(aes(x=week, y=value, col = factor(strata_cat)), size=0.8) + 
+      scale_colour_viridis(discrete=T)+
+      geom_point(aes(x=week, y=value, col = factor(strata_cat)), size=1.5)+
+      geom_line(data = allindex_week %>% filter(subs == "st", country_name == "United States"), aes(x=week, y=metric/5))+
+      scale_y_continuous("Mean contacts", sec.axis = sec_axis(trans=~.*5, name = "Stringency index")) + theme +
+ggtitle("US")
+
+png("../Plot/osi_meancontact.png",height = 8,width = 8, units = 'in',res=600)
+grid.arrange(p1,p2,p3,p4,p5,p6)
+dev.off()
+
+```
+
+
+## COVID government restriction tracker index during study period
+```{r}
+library(tidyr)
+
+
+df <- list_all[[1]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA","ZAF")) %>% select(1:366) %>% gather(date, value, '01Jan2020':'29Dec2020') %>%
+ mutate(date1 = rep(as.Date("2020-01-01"):as.Date("2020-12-29"), each =12),
+        date1 = as.Date(date1, origin = "1970-01-01"),
+        week = rep(1:52, each =84))
+
+df %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Government stringency")
+
+df %>%  ggplot(aes(x=date1, y=value)) + geom_line(aes(x=date1, y=value))+ facet_wrap(~country_code)
+  
+   ggplot(aes(x=week, y=country_name)) + 
+              geom_tile(color="white", size=0.1, aes(fill = metric)) +
+              geom_text(aes(label = round(flag_bin)))+
+              scale_fill_viridis() +
+              xlim(1,52)+
+              scale_x_continuous(expand = c(0, 0),
+                                 breaks = c(1,5,9,13,18,22,26.5,31,35,39,44,48), 
+                                  labels=c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"))+
+              xlab("Month") + ylab("Country") + 
+              facet_wrap(index~.)+theme
+
+saveRDS(df,"govt_stringency.RDS")
+
+```
+
+```{r}
+## Plot themes
+theme<- theme_classic()+
+  theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+        axis.title=element_text(size=15),
+        axis.text = element_text(size=15),
+        #axis.label = element_text(size=15),
+        legend.title = element_text(size=15),
+        legend.text = element_text(size =15),
+        panel.grid.minor=element_blank(),
+        panel.grid.major.y=element_blank(),
+        panel.grid.major.x=element_line(),
+        panel.border=element_blank())
+
+
+png("../Plot/osi_grid.png",height = 22,width = 14, units = 'in',res=600)
+allindex_week %>% 
+              filter(subs!= "st") %>%
+              ggplot(aes(x=week, y=index)) + 
+              geom_tile(color="white", size=0.1, aes(fill = metric)) +
+              geom_text(aes(label = round(flag_bin)))+
+              scale_fill_viridis() +
+              xlim(1,52)+
+              scale_x_continuous(expand = c(0, 0),
+                                 breaks = c(1,5,9,13,18,22,26.5,31,35,39,44,48), 
+                                  labels=c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"))+
+              xlab("Month") + ylab("Index") + 
+              facet_grid(country_name~.)+theme
+dev.off()
+
+
+png("../Plot/osi_grid1.png",height = 22,width = 14, units = 'in',res=600)
+allindex_week %>% 
+              filter(subs!= "st") %>%
+              ggplot(aes(x=week, y=country_name)) + 
+              geom_tile(color="white", size=0.1, aes(fill = metric)) +
+              geom_text(aes(label = round(flag_bin)))+
+              scale_fill_viridis() +
+              xlim(1,52)+
+              scale_x_continuous(expand = c(0, 0),
+                                 breaks = c(1,5,9,13,18,22,26.5,31,35,39,44,48), 
+                                  labels=c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"))+
+              xlab("Month") + ylab("Country") + 
+              facet_grid(index~.)+theme
+dev.off()
+
+png("../Plot/osi_grid2.png",height = 22,width = 14, units = 'in',res=600)
+allindex_week %>% filter(index %in% tab_names[c(13,15,17,19)]) %>%
+              ggplot(aes(x=week, y=country_name)) + 
+              geom_tile(color="white", size=0.1, aes(fill = value)) +
+              scale_fill_viridis() +
+              xlim(1,52)+
+              scale_x_continuous(expand = c(0, 0),
+                                 breaks = c(1,5,9,13,18,22,26.5,31,35,39,44,48), 
+                                  labels=c("Jan","Feb","Mar","Apr","May","June","July","Aug","Sept","Oct","Nov","Dec"))+
+              facet_grid(index~.)+theme
+dev.off()
+

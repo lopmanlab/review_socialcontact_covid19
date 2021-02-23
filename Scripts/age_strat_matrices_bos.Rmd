@@ -1,0 +1,116 @@
+---
+title: "age_strat_matrices_bos"
+author: "Carol Liu"
+date: "12/14/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1),
+              legend.title = element_blank())
+
+```
+
+## Read in data
+For age-specific matrices for France, we note that while Bosetti et al paper presents stratified results by setting, they presented age-specific matrices among reported contacts 
+```{r}
+lock_m <- read.csv("../Data/11_Bosetti/Matrices_LD_France/ALLcontacts_LD.csv") ## all contacts
+pop_age <- read.csv("../Data/11_Bosetti/pyramide-des-ages-2020.csv")
+part_age <- pop_age %>% group_by(part_age) %>% summarize(pop_age=sum(Total)) %>% mutate(part_age_weight = pop_age/sum(pop_age)) %>% select(part_age,part_age_weight)
+
+colnames(lock_m) <- c("classe_age","0-10","11-20","[21,31)","[31,41)","[41,51)","[51,61)","[61,71)","[71,81)","81+")
+
+## Re combine the age groups based on age distribution of france
+
+lock_new <- lock_m %>% 
+            tidyr::gather(cont_age, value,-classe_age) %>%
+            left_join(
+              pop_age %>% group_by(classe_age) %>% summarize(pop_age=sum(Total)) %>% mutate(prop_age = pop_age/sum(pop_age)),
+              by="classe_age") %>%
+            left_join(data.frame(classe_age = unique(lock_m$classe_age),
+                                 part_age = c("18-20","[21,31)","[21,31)","[31,41)","[31,41)","[41,51)","[41,51)","[51,61)","[51,61)","[61,71)","[61,71)","[71,81)","[71,81)","81+","81+","81+")),
+                      by="classe_age") %>%
+            left_join(part_age, by="part_age")
+
+lock_new <- lock_new %>% filter(classe_age !="18-20" & cont_age !="0-10" & cont_age !="11-20") %>%
+          mutate(new_value = value*prop_age) %>% group_by(part_age, cont_age) %>% summarize(value = sum(new_value),part_age_weight=mean(part_age_weight)) %>% 
+          mutate(value = value/part_age_weight) %>%
+          select(part_age,cont_age,value) 
+
+
+```
+
+## Baseline data- COMES-F
+Results without supplementary professional contacts "SPC". This was for participants with more than 20 daily professional contacts. They were asked not to report them but rather to provide their total number and age distribution (0-3 years, 3-10 years, 11-17 years, 18-64 years and 64+ years). 
+```{r}
+
+france <- get_survey("https://doi.org/10.5281/zenodo.3886590")
+#m1 <- contact_matrix(france, countries = "France", age.limits = c(21,31,41,51,61,71,81), n=10,symmetric = T,weigh.dayofweek = T)
+#mr1 <- Reduce("+", lapply(m1$matrices, function(x) {x$matrix})) / length(m1$matrices)
+
+
+## Keep only those from wave 1?
+
+#france1<- france
+#france1$participants <- france1$participants %>% filter(wave == 2)
+#france1$contacts <- france1$contacts %>% filter(wave==2)
+#m2 <- contact_matrix(france1, countries = "France", age.limits = c(21,31,41,51,61,71,81), n=10,symmetric = T,weigh.dayofweek = T)
+#mr2 <- Reduce("+", lapply(m2$matrices, function(x) {x$matrix})) / length(m2$matrices)
+
+## Used wave 2 studyday 1
+france2<- france
+france2$participants <- france2$participants %>% filter(wave == 2)
+france2$contacts <- france2$contacts %>% filter(wave==2 & studyDay==1)
+m3 <- contact_matrix(france2, countries = "France", symmetric = T, age.limits = c(21,31,41,51,61,71,81), n=1000,weigh.dayofweek = T)
+mr3 <- Reduce("+", lapply(m3$matrices, function(x) {x$matrix})) / length(m3$matrices)
+df3 <- melt(mr3, varnames = c("age1", "age2"), value.name = "contacts")  %>% left_join(
+               data.frame(age1 = c(1,2,3,4,5,6,7),
+                          age1_cat = as.factor(c("[21,31)","[31,41)","[41,51)","[51,61)","[61,71)","[71,81)","81+"))))
+
+lock_new
+mr3
+
+```
+
+
+```{r}
+
+france_change <- lock_new %>% 
+  left_join(df3, by=c("part_age" = "age1_cat","cont_age" = "age2")) %>%
+  mutate(abs_change = value-contacts,
+         perc_change = (value - contacts)/value) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -3.5, limit = c(-6,0.13))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme +  theme(plot.title = element_text(hjust=0.5, face="bold",size=12)) + ggtitle("France")
+
+png("../Plot/Panel1/11_Bosetti_absolute_change_all.png",width=800, height=600,res=150)
+france_change
+dev.off()
+
+```
+## Average number of contacts by age at baseline
+```{r}
+france$participants$agecat1 <- 0
+france$participants %>% left_join(
+  france$contacts %>% group_by(part_id, wave, studyDay) %>% summarize(avg_cont=n()), by=c("part_id"="part_id", "wave"="wave", "studyDay"="studyDay")
+) %>%mutate(age_cat1 = ifelse(part_age < 18, "0-17",
+                                            ifelse(part_age <25, "18-24",
+                                              ifelse(part_age<45, "25-44",
+                                                ifelse(part_age <65, "45-64","65+"))))) %>% 
+  group_by(age_cat1) %>%
+  summarize(mean_cont = mean(avg_cont, na.rm=T))
+
+
+```
+
+
+

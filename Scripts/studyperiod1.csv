@@ -1,0 +1,67 @@
+country_name,week,subs,flag,metric,flag_bin,index,country_study
+Belgium,18,NA,NA,1,NA,   Coletti,Belgium_Col
+Belgium,24,NA,NA,2,NA,   Coletti,Belgium_Col
+Belgium,30,NA,NA,3,NA,   Coletti,Belgium_Col
+Belgium,14,NA,NA,1,NA,   Del Fava   ,Belgium_Del
+China,6,NA,NA,1,NA,Wuhan,China-Wuhan
+China,19,NA,NA,2,NA,Wuhan,China-Wuhan
+China,20,NA,NA,2,NA,Wuhan,China-Wuhan
+China,6,NA,NA,1,NA,"SH, CS, SZ",China-Shenzhen
+China,10,NA,NA,2,NA,"SH, CS, SZ",China-Shenzhen
+China,11,NA,NA,2,NA,"SH, CS, SZ",China-Shenzhen
+China,12,NA,NA,2,NA,"SH, CS, SZ",China-Shenzhen
+China,6,NA,NA,1,NA,"SH, CS, SZ",China-Shanghai
+China,10,NA,NA,2,NA,"SH, CS, SZ",China-Shanghai
+China,11,NA,NA,2,NA,"SH, CS, SZ",China-Shanghai
+China,12,NA,NA,2,NA,"SH, CS, SZ",China-Shanghai
+China,6,NA,NA,1,NA,"SH, CS, SZ",China-Changsha
+China,10,NA,NA,2,NA,"SH, CS, SZ",China-Changsha
+China,11,NA,NA,2,NA,"SH, CS, SZ",China-Changsha
+China,12,NA,NA,2,NA,"SH, CS, SZ",China-Changsha
+France,16,NA,NA,1,NA,   Bosetti,Frace_Bos
+France,17,NA,NA,1,NA,   Bosetti,Frace_Bos
+France,14,NA,NA,1,NA,   Del Fava   ,France_Del
+Germany,13,NA,NA,1,NA,   Del Fava   ,France_Del
+Greece,14,NA,NA,1,NA,   Sypsa    ,Greece
+Italy,13,NA,NA,1,NA,   Del Fava   ,Italy_Del
+Kenya,19,NA,NA,1,NA,   Quaife   ,Kenya
+Kenya,20,NA,NA,1,NA,   Quaife   ,Kenya
+Kenya,21,NA,NA,1,NA,   Quaife   ,Kenya
+Kenya,22,NA,NA,1,NA,   Quaife   ,Kenya
+Luxembourg,13,NA,NA,1,NA,Latsuzbaia,Luxembourg
+Luxembourg,14,NA,NA,1,NA,Latsuzbaia,Luxembourg
+Luxembourg,15,NA,NA,1,NA,Latsuzbaia,Luxembourg
+Luxembourg,16,NA,NA,1,NA,Latsuzbaia,Luxembourg
+Luxembourg,17,NA,NA,1,NA,Latsuzbaia,Luxembourg
+Luxembourg,25,NA,NA,2,NA,Latsuzbaia,Luxembourg
+Luxembourg,26,NA,NA,2,NA,Latsuzbaia,Luxembourg
+Netherlands,14,NA,NA,1,NA,   Backer,Netherlands_Bak
+Netherlands,15,NA,NA,1,NA,   Backer,Netherlands_Bak
+Netherlands,16,NA,NA,1,NA,   Backer,Netherlands_Bak
+Netherlands,17,NA,NA,1,NA,   Backer,Netherlands_Bak
+Netherlands,18,NA,NA,1,NA,   Backer,Netherlands_Bak
+Netherlands,23,NA,NA,2,NA,   Backer,Netherlands_Bak
+Netherlands,24,NA,NA,2,NA,   Backer,Netherlands_Bak
+Netherlands,25,NA,NA,2,NA,   Backer,Netherlands_Bak
+Netherlands,26,NA,NA,2,NA,   Backer,Netherlands_Bak
+Netherlands,14,NA,NA,1,NA,   Del Fava   ,Netherlands_Del
+South Africa,23,NA,NA,1,NA,McCreesh,South Africa
+South Africa,24,NA,NA,1,NA,McCreesh,South Africa
+South Africa,25,NA,NA,1,NA,McCreesh,South Africa
+South Africa,26,NA,NA,1,NA,McCreesh,South Africa
+South Africa,27,NA,NA,1,NA,McCreesh,South Africa
+South Africa,28,NA,NA,1,NA,McCreesh,South Africa
+South Africa,29,NA,NA,1,NA,McCreesh,South Africa
+South Africa,30,NA,NA,2,NA,McCreesh,South Africa
+South Africa,31,NA,NA,2,NA,McCreesh,South Africa
+South Africa,32,NA,NA,2,NA,McCreesh,South Africa
+South Africa,33,NA,NA,2,NA,McCreesh,South Africa
+United Kingdom,14,NA,NA,1,NA,   Del Fava   ,UK_Del
+United Kingdom,13,NA,NA,1,NA,   Jarvis,UK_Jarvis
+United States,13,NA,NA,1,NA,   Feehan   ,US
+United States,14,NA,NA,1,NA,   Feehan   ,US
+United States,15,NA,NA,1,NA,   Feehan   ,US
+United States,25,NA,NA,2,NA,   Feehan   ,US
+United States,26,NA,NA,2,NA,   Feehan   ,US
+United States,38,NA,NA,3,NA,   Feehan   ,US
+United States,39,NA,NA,3,NA,   Feehan   ,US

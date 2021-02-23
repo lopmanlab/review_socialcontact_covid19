@@ -1,0 +1,413 @@
+---
+title: "age_strat_matrices_zhang"
+author: "Carol Liu"
+date: "11/27/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+#Theme for ggplot
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1),
+              legend.title = element_blank())
+
+# Function for contact matrices
+matrix_viz <- function(df1, part_age= part_age,cont_age=cont_age, fill = "rel", limit, title) {
+                          
+  if (fill == "rel") {                                                   # if want to plot relative change
+          
+    plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + 
+              scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit = c(-1,1))
+    
+    } else {
+              if (missing(limit)) {
+                      limit <- c(min(df1$abs_change),0)                   # if no limit specified, use the maximum value
+                } else{
+                      limit=limit                                         # otherwise use the limit specified
+  }
+      
+      mid <- (limit[1] - limit[2])/2                                      # midpoint for legend
+     
+      plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = mid, limit =limit)
+            
+  }
+
+    plot99 + xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme + ggtitle(title)
+}
+
+
+```
+
+## Import text matrices
+```{r}
+setwd("C:/Users/cliu369/Box Sync/5.Literature/1.Social contact patterns Lit Review 2020/0_2020rapidreview/Data/9_Zhang/matrix_rds")                                 #Set wd for chunk, not good practice but suffice for now
+
+cs_base <- readRDS("changsha_base.RDS")
+cs_lock <- readRDS("changsha_outbreak.RDS")
+sh_base <- readRDS("shanghai_base.RDS")
+sh_lock <- readRDS("shanghai_outbreak.RDS")
+sz_base <- readRDS("shenzhen_base.RDS")
+sz_lock <- readRDS("shenzhen_outbreak.RDS")
+wh_base <- readRDS("wuhan_base.RDS")
+wh_lock <- readRDS("wuhan_outbreak.RDS")
+
+```
+
+## Changsha
+```{r}
+cs <- cs_lock %>%  
+      melt(varnames = c("part_age", "cont_age"), value.name = "contacts") %>%
+      left_join(
+        cs_base %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts"),
+        by = c("part_age"="part_age","cont_age"="cont_age")
+      ) %>%
+      mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)
+
+png("Data/11_Zhang/changsha_rel_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(cs, part_age= part_age)
+dev.off()
+
+png("../Plot/Panel1/9_Zhang_changsha_abs_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(cs, part_age= part_age, fill="abs",limit=c(min(cs$abs_change), max(cs$abs_change)), title = "China-Changsha")
+dev.off()
+
+
+```
+
+
+## Shanghai
+```{r}
+sh <- sh_lock %>%  
+      melt(varnames = c("part_age", "cont_age"), value.name = "contacts") %>%
+      left_join(
+        sh_base %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts"),
+        by = c("part_age"="part_age","variable"="variable")
+      ) %>% 
+      mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y,
+             part_age = replace(part_age, part_age=="5-9","05-9")) %>%
+      rename("cont_age" = "variable")
+
+png("Data/11_Zhang/shanghai_rel_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(sh, part_age= part_age)
+dev.off()
+
+png("../Plot/Panel1/9_Zhang_shanghai_abs_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(sh, part_age= part_age, fill="abs",limit=c(-18,0.33), title = "China-Shanghai")
+dev.off()
+
+
+```
+## Shenzhen
+```{r}
+sz <- sz_lock %>%  
+      melt(varnames = c("part_age", "cont_age"), value.name = "contacts") %>%
+      left_join(
+        sz_base %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts"),
+        by = c("part_age"="part_age","cont_age"="cont_age")
+      ) %>%
+      mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)
+png("Data/11_Zhang/shenzhen_rel_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(sz, part_age= part_age)
+dev.off()
+
+
+png("../Plot/Panel1/9_Zhang_shenzhen_abs_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(sz, part_age= part_age, fill="abs",limit=c(-10,0.43),title="China-Shenzhen")
+dev.off()
+
+```
+
+## Wuhan
+```{r}
+wh <- wh_lock %>%  
+      melt(varnames = c("part_age", "cont_age"), value.name = "contacts") %>%
+      left_join(
+        wh_base %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts"),
+        by = c("part_age"="part_age","variable"="variable")
+      ) %>%
+      mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y,
+             part_age = replace(part_age, part_age=="5-9","05-9")) %>%
+      rename("cont_age" = "variable")
+
+png("Data/11_Zhang/wuhan_rel_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(wh, part_age= part_age)
+dev.off()
+
+png("../Plot/Panel1/9_Zhang_wuhan_abs_change_all_sym.png",width=800, height=600,res=150)
+matrix_viz(wh, part_age= part_age, fill="abs",limit=c(-10,0.54), title="China-Wuhan")
+dev.off()
+
+max(wh$abs_change)
+min(wh$abs_change)
+```
+
+## Shanghai raw data
+
+```{r}
+setwd("C:/Users/cliu369/Box Sync/5.Literature/1.Social contact patterns Lit Review 2020/0_2020rapidreview/Data/11_Zhang")                                 #Set wd for chunk, not good practice but suffice for now
+
+cont_outbreak <-read.csv("2020_Zhang_China_contact_common_outbreak.csv")
+part_common <-read.csv("2020_Zhang_China_participant_common.csv")
+part_extra <- read.csv("2020_Zhang_China_participant_extra.csv")
+
+cont_base <-read.csv("2019_Zhang_China_contact_common.csv")
+cont_base_extra <- read.csv("2019_Zhang_China_contact_extra.csv")
+part_base <- read.csv("2019_Zhang_China_participant_common.csv")
+
+
+head(part_common)
+head(part_extra)
+length(unique(cont_base$part_id))
+
+table(cont_base$cnt_work)
+```
+## SHanghai average contacts by setting - setting up the dataframes for contact matrices
+```{r}
+# baseline
+place_cont <- cont_base %>% group_by(part_id) %>% summarize(home = sum(cnt_home),
+                                              work = sum(cnt_work),
+                                              school = sum(cnt_school))
+
+other_cont <- cont_base %>% filter(cnt_home=="FALSE" &  cnt_work == "FALSE" & cnt_school =="FALSE") %>%
+                            group_by(part_id) %>% summarize(other = n())
+
+place_cont <- place_cont %>% left_join(other_cont) 
+
+mean(place_cont$home)
+mean(place_cont$work)
+mean(place_cont$school)
+mean(place_cont$other,na.rm=T)
+
+head(cont_base)
+
+
+sh_id <- part_extra$part_id[which(part_extra$survey_location == "Shanghai")]
+cont_outbreak_sh <- cont_outbreak[cont_outbreak$part_id %in% sh_id,]
+part_common_sh <- part_common[part_common$part_id %in% sh_id,]
+
+
+survey_lock <- survey(participants = part_common_sh,
+                     contacts = cont_outbreak_sh)
+
+survey_base <- survey(participants = part_base,
+                      contacts = cont_base)
+
+
+
+```
+
+# First, check if zenodo data from shanghai matches contact matrix 
+```{r}
+
+m1 <- contact_matrix(survey_base, countries = "China", age.limits = c(0,5,10,15,20,25,30,35,40,45,50,55,60,65),
+               missing.contact.age="remove",missing.participant.age = "remove", estimated.contact.age = "mean", n=10) 
+
+mr1 <- Reduce("+", lapply(m1$matrices, function(x) {x$matrix})) / length(m1$matrices)
+
+
+sh_base_zen <- melt(mr1, varnames = c("part_age", "cont_age"), value.name = "contacts")
+sh_base <- melt(sh_base,varnames = c("part_age","cont_age"),value.name = "contacts")
+
+sh_base_zen %>% ggplot(aes(x = part_age, y = cont_age, fill = contacts)) + 
+            scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3",limit=c(0,4),midpoint = 2)+
+            xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+
+sh_base %>% ggplot(aes(x = part_age, y = variable, fill = contacts)) + 
+            scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3",limit=c(0,18),midpoint = 9)+
+            xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+
+```
+
+
+```{r}
+### Location specific for lockdown matrices
+nboots <-10
+
+survey_lock$contacts <- survey_lock$contacts %>% mutate(
+                        cnt_school = ifelse(cnt_school =="TRUE",1,
+                                      ifelse(is.na(cnt_school),0,0)),
+                        cnt_home = ifelse(cnt_home =="TRUE",1,
+                                       ifelse(is.na(cnt_home),0,0)),  
+                        cnt_work = ifelse(cnt_work =="TRUE", 1,
+                                        ifelse(is.na(cnt_work),0,0)),
+                        cnt_school = tidyr::replace_na(cnt_school,0),
+                        cnt_home = tidyr::replace_na(cnt_home, 0),
+                        cnt_work = tidyr::replace_na(cnt_work, 0))
+
+
+age_limits = c(0,5,10,15,20,25,30,35,40,45,50,55,60,65)
+filter_s<- list()
+filter_s$cnt_school =1
+
+filter_h <- list()
+filter_h$cnt_home=1
+
+filter_w <- list()
+filter_w$cnt_work=1
+
+filter_o<- list()
+filter_o$cnt_school =0
+filter_o$cnt_home =0
+filter_o$cnt_work =0 
+
+list_m1<-list()
+list_m1 <- list(
+        lock_s= contact_matrix(survey_lock, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_s),
+        lock_w = contact_matrix(survey_lock, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_w),
+        lock_h = contact_matrix(survey_lock, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_h),
+        lock_o = contact_matrix(survey_lock, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_o)
+)
+
+list_mr1 <- list()
+for (i in 1:length(list_m1)){
+  list_mr1[[i]] <- Reduce("+", lapply(list_m1[[i]]$matrices, function(x) {x$matrix})) /     length(list_m1[[i]]$matrices)
+  #list_lock_m1 <- melt(list_mr1[[i]], varnames = c("part_age", "cont_age"), value.name = "contacts")       # this doesn't fit well into a list for some reason?
+}
+
+
+lock_s <- list_mr1[[1]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_w <- list_mr1[[2]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_h <- list_mr1[[3]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_o <- list_mr1[[4]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+
+
+
+```
+## Location specific for base 
+```{r}
+survey_base$contacts <- survey_base$contacts %>% mutate(
+                        cnt_school = ifelse(cnt_school =="TRUE",1,
+                                      ifelse(is.na(cnt_school),0,0)),
+                        cnt_home = ifelse(cnt_home =="TRUE",1,
+                                       ifelse(is.na(cnt_home),0,0)),  
+                        cnt_work = ifelse(cnt_work =="TRUE", 1,
+                                        ifelse(is.na(cnt_work),0,0)),
+                        cnt_school = tidyr::replace_na(cnt_school,0),
+                        cnt_home = tidyr::replace_na(cnt_home, 0),
+                        cnt_work = tidyr::replace_na(cnt_work, 0))
+
+
+list_m2<-list()
+list_m2 <- list(
+        base_s= contact_matrix(survey_base, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_s),
+        base_w = contact_matrix(survey_base, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_w),
+        base_h = contact_matrix(survey_base, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_h),
+        base_o = contact_matrix(survey_base, countries = "China", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_o)
+)
+
+list_mr2 <- list()
+for (i in 1:length(list_m2)){
+  list_mr2[[i]] <- Reduce("+", lapply(list_m2[[i]]$matrices, function(x) {x$matrix})) /     length(list_m2[[i]]$matrices)
+  #list_lock_m1 <- melt(list_mr1[[i]], varnames = c("part_age", "cont_age"), value.name = "contacts")       # this doesn't fit well into a list for some reason?
+}
+
+
+base_s <- list_mr2[[1]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_w <- list_mr2[[2]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_h <- list_mr2[[3]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_o <- list_mr2[[4]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+
+```
+```{r}
+## Setting specific changes in contact patterns
+
+sh_h <- lock_h %>% 
+          left_join(base_h, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:14),
+                               part_age_cat = as.character(unique(lock_h$cont_age)), by="part_age")) %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y) %>%
+                 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat") %>%
+        mutate(part_age = replace(part_age, part_age=="[5,10)","[05,10)"))
+  
+sh_w <- lock_w %>%
+          left_join(base_w, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:14),
+                               part_age_cat = as.character(unique(lock_h$cont_age)), by="part_age")) %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y) %>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")%>%
+        mutate(part_age = replace(part_age, part_age=="[5,10)","[05,10)"))
+
+sh_s <- lock_s %>%
+          left_join(base_s, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:14),
+                               part_age_cat = as.character(unique(lock_h$cont_age)), by="part_age")) %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y) %>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")%>%
+        mutate(part_age = replace(part_age, part_age=="[5,10)","[05,10)"))
+
+sh_o <- lock_o %>%
+          left_join(base_o, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+           left_join(data.frame(part_age = seq(1:14),
+                               part_age_cat = as.character(unique(lock_h$cont_age)), by="part_age")) %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y) %>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")%>%
+        mutate(part_age = replace(part_age, part_age=="[5,10)","[05,10)"))
+
+
+
+```
+
+# RElative change
+```{r}
+matrix_viz(sh_h)
+matrix_viz(sh_w)
+matrix_viz(sh_s)
+matrix_viz(sh_o)
+```
+
+# Absolute change
+```{r}
+png("Data/11_Zhang/abs_change_sh_home.png",width=800, height=600,res=150)
+sh_h %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -0.65, limit =c(-1.5,0.3))+
+            xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+dev.off()
+
+png("Data/11_Zhang/abs_change_sh_work.png",width=800, height=600,res=150)
+sh_w %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -0.75, limit =c(-1.5,0))+
+            xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+dev.off()
+
+png("Data/11_Zhang/abs_change_sh_school.png",width=800, height=600,res=150)
+sh_s %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -0.75, limit =c(-1.5,0))+
+            xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+dev.off()
+
+png("Data/11_Zhang/abs_change_sh_other.png",width=800, height=600,res=150)
+sh_o %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -0.75, limit =c(-1.5,0.1))+
+            xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+dev.off()
+```
+

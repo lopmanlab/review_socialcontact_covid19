@@ -1,0 +1,86 @@
+---
+title: "age_strat_matrices_feehan_quaife"
+author: "Carol Liu"
+date: "11/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+df <- read.csv("../Data/4_Feehan/contact_rel_change.csv")
+kenya <- read.csv("../Data/7_Quaife/contact_data_overall.csv")
+
+
+#Theme for ggplot
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=12),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1),
+              legend.title = element_blank())
+
+# Function for contact matrices
+# Function for contact matrices
+matrix_viz <- function(df1, part_age= part_age,cont_age=cont_age, fill = "rel", limit, title) {
+                          
+  if (fill == "rel") {                                                   # if want to plot relative change
+          
+    plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + 
+              scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit = c(-1,1))
+    
+    } else {
+              if (missing(limit)) {
+                      limit <- c(min(df1$abs_change),0)                   # if no limit specified, use the maximum value
+                } else{
+                      limit=limit                                         # otherwise use the limit specified
+  }
+      
+      mid <- (limit[1] - limit[2])/2                                      # midpoint for legend
+     
+      plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = mid, limit =limit)
+            
+  }
+
+    plot99 + xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme + ggtitle(title)
+}
+```
+
+## Relative and absolute changes in contacts for US
+```{r}
+df <- df %>% mutate(abs_change = lckdown-base,
+                    perc_change = (-1)*perc_change)
+
+png("Data/4_Feehan/rel_change.png",width=800, height=600,res=150)
+matrix_viz(df)
+dev.off()
+
+png("../Plot/Panel1/4_Feehan_absolute_change_all.png",width=800, height=600,res=150)
+matrix_viz(df, fill="abs",limit=c(-7,0), title="US")
+dev.off()
+
+```
+## Overall changes by age
+```{r}
+df %>% group_by(part_age) %>%
+        summarize(base=sum(base),
+                  lckdown=sum(lckdown)) %>%
+        mutate(perc_red = 1-lckdown/base)
+```
+
+## Relative and absolute changes in contacts in Kenya
+```{r}
+kenya <- kenya %>% mutate(abs_change = lckdown-base,
+                 perc_change = (lckdown-base)/base) 
+
+png("../Plot/Panel1/7_Quaife_abs_change.png",width=800, height=600,res=150)
+kenya %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint =-10 , limit =c(-29,10))+xlab("Age of       participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme + ggtitle("Kenya-Nairobi")
+dev.off()
+```
+

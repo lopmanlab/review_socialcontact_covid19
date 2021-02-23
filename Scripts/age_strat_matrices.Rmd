@@ -1,0 +1,219 @@
+---
+title: "Age-strat matrices"
+author: "Carol Liu"
+date: "11/7/2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(dplyr)
+library(kableExtra)
+library(forestplot)
+library(ggalt)
+library(plotly)
+library(forcats)
+library(ggpubr)
+library(here)
+library(socialmixr)
+library(RColorBrewer)
+library(reshape2)
+
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=12),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1))
+
+getwd()
+```
+## Netherland Backer
+```{r}
+neth_bac<- read.table(file = '../Data/1_Backer/socialcontact1.tsv', sep = '\t', header = TRUE)
+df <- read.table(file = '../Data/1_Backer/socialcontact2.tsv', sep = '\t', header = TRUE) %>%
+      mutate(part_age = factor(part_age,levels = c("[0,5)","[5,10)","[10,20)","[20,30)","[30,40)","[40,50)","[50,60)","[60,70)","[70,80)","[80,Inf]")),
+             cont_age = factor(cont_age, levels =  c("[0,5)","[5,10)","[10,20)","[20,30)","[30,40)","[40,50)","[50,60)","[60,70)","[70,80)","[80,Inf]"))
+             )  # factorize participant and contact ages
+
+png("../Data/1_Backer/absolute_change_all.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "all") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="all"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change))  + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -5, limit = c(-10,0),
+                         name = "Diff. in \ncontacts\npre- and in\nlockdown")+
+    #scale_fill_gradient2(low = "maroon4", high = "white", mid ="navajowhite2", midpoint = -5, limit =  c(-10,0))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme + theme(legend.title = element_text(size = 9))+ ggtitle("Netherlands")
+dev.off()
+
+png("../Data/1_Backer/percent_change_all.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "all") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="all"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 0.5, limit = c(0,1))+
+    #scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit =  c(-1,1))+
+    xlab("Age of participant")+ylab("Age of contact")+==
+    geom_tile()+ theme
+dev.off()
+
+
+png("../Data/1_Backer/absolute_change_community.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "community") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="community"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -5, limit = c(-10,0))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+dev.off()
+
+png("../Data/1_Backer/percent_change_community.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "community") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="community"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit =  c(-1,1))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+dev.off()
+
+png("../Data/1_Backer/absolute_change_hh.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "household") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="household"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -2.5, limit = c(-5,0.2))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+dev.off()
+
+png("../Data/1_Backer/percent_change_hh.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "household") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="household"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit = c(-1,1))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+dev.off()
+
+```
+# Panel 1
+```{r}
+png("../Plot/Panel1/1_Backer_absolute_change_all.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "all") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="all"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -5, limit = c(-10,0))+
+    #scale_fill_gradient2(low = "maroon4", high = "white", mid ="navajowhite2", midpoint = -5, limit =  c(-10,0))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme + ggtitle("Netherlands")
+dev.off()
+```
+# Panel 2
+```{r}
+png("../Plot/Panel2/1_Backer_absolute_change_community.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "community") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="community"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -4, limit = c(-8,0))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme + theme(plot.title = element_text(hjust=0.5, face="bold",size=10)) +ggtitle("Community")
+dev.off()
+
+png("../Plot/Panel2/1_Backer_absolute_change_hh.png",width=800, height=600,res=150)
+df %>% filter(survey=="baseline" & contact_type == "household") %>%
+    left_join(df %>% filter(survey=="physical distancing" & contact_type=="household"),
+              by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
+    mutate(abs_change = m_est.y - m_est.x,
+           perc_change = (m_est.y-m_est.x)/m_est.x) %>%
+    ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -4, limit = c(-8,0.2))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme + theme(plot.title = element_text(hjust=0.5, face="bold",size=10)) +ggtitle("Household")
+dev.off()
+```
+
+
+## Change by setting
+```{r}
+## SUmming estimated number of contacts by participant of age group i with all participants of age group j and then taking an average
+df %>% filter(survey=="baseline" & contact_type == "household")  %>% summarize(cnt_hh = sum(m_est)/10)
+
+df %>% filter(survey=="baseline" & contact_type == "community") %>% summarize(cnt_comm = sum(m_est)/10)
+
+df %>% filter(survey=="physical distancing" & contact_type == "household")  %>% summarize(cnt_hh = sum(m_est)/10)
+
+df %>% filter(survey=="physical distancing" & contact_type == "community") %>% summarize(cnt_comm = sum(m_est)/10)
+
+## Better to take a weighted average
+## DIstribution of age groups for baseline and lockdown surveys from the preprint
+prop_age<- data.frame(part_age = unique(df$part_age),
+                      base = c(0.138, 0.062, 0.112, 0.143, 0.123, 0.112, 0.104, 0.115, 0.075, 0.016),
+                      lock = c(0.075, 0.052, 0.087, 0.126, 0.155,0.149, 0.157,0.116, 0.072, 0.011))
+
+
+
+df %>% filter(survey == "baseline" & contact_type == "household") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+
+
+df %>% filter(survey == "baseline" & contact_type == "community") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+df %>% filter(survey == "physical distancing" & contact_type == "household") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+df %>% filter(survey == "physical distancing" & contact_type == "community") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+
+unique(neth_bac$survey)
+
+neth_bac%>% filter(survey == "April 2020" & contact_type == "community") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+neth_bac%>% filter(survey == "June 2020" & contact_type == "community") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+
+neth_bac%>% filter(survey == "June 2020" & contact_type == "household") %>% group_by(part_age) %>% summarize(cnt_hh= sum(m_est)) %>% left_join(
+  prop_age %>% select(part_age, base), by="part_age"
+) %>%
+  mutate(contacts = cnt_hh*base) %>% summarize(sum(contacts))
+
+```
+

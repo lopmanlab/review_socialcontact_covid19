@@ -1,0 +1,445 @@
+---
+title: "age_strat_matrices_col"
+author: "Carol Liu"
+date: "11/29/2020"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+#Theme for ggplot
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1),
+              legend.title = element_blank())
+
+# Function for contact matrices
+matrix_viz <- function(df1, part_age= part_age,cont_age=cont_age, fill = "rel", limit) {
+                          
+  if (fill == "rel") {                                                   # if want to plot relative change
+          
+    plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + 
+              scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit = c(-1,1))
+    
+    } else {
+              if (missing(limit)) {
+                      limit <- c(min(df1$abs_change),0)                   # if no limit specified, use the maximum value
+                } else{
+                      limit=limit                                         # otherwise use the limit specified
+  }
+      
+      mid <- (limit[1] - limit[2])/2                                      # midpoint for legend
+     
+      plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = mid, limit =limit)
+            
+  }
+
+    plot99 + xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme
+}
+
+```
+
+## Belgium Coletti - lockdown
+```{r}
+## 2020 lockdown surveys
+
+x = list()
+datafolder = here::here("Data/2_Coletti")
+dataname = list.files(path=datafolder,pattern = "*.csv")
+filenames = list.files(datafolder, pattern = "*.csv", full.names=TRUE)
+
+datatable = data.frame(Dataset = rep("TBD",length(filenames)), Observations = rep(0,length(filenames)), Variables = rep(0,length(filenames)),stringsAsFactors = FALSE)
+
+for (n in 1:length(filenames))
+{
+  x[[n]] = read.csv(filenames[n])
+  x[[n]]$dataset = dataname[n] #add column indicating file/data name
+  
+  datatable[n,1] = dataname[n] #make an overview table of all SAS files/datasets showing rows/columns for each
+  datatable[n,2] = nrow(x[[n]])
+  datatable[n,3] = ncol(x[[n]])
+}
+
+surveydata <-survey(participants = cbind(
+            x[[6]][x[[6]]$part_id %in% x[[8]][x[[8]]$wave==1,]$part_id,],   ## Select only wave 1
+            country=c("Belgium"),
+            year=c(2020)),   
+            contacts = x[[2]][x[[2]]$part_id %in% x[[8]][x[[8]]$wave==1,]$part_id,])   ## Select only wave 1
+## Remove participant's less than 18 in attempt to make matrix symmetric
+
+m1 <- contact_matrix(surveydata, countries = "Belgium", age.limits = c(18,30,40,50,60,70),
+               missing.contact.age="remove",missing.participant.age = "remove", estimated.contact.age = "mean", n=1000, weigh.dayofweek = T) 
+
+
+mr <- Reduce("+", lapply(m1$matrices, function(x) {x$matrix})) / length(m1$matrices)
+df1 <- melt(mr, varnames = c("age1", "age2"), value.name = "contacts")
+
+
+ggplot(df1, aes(x = age1, y = age2, fill = contacts)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 1.6, limit = c(0,3.2))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+
+
+```
+
+## Belgium- prepandemic figure out what to use
+Seems like different surveys not sure which one to use. Neither of the surveys below are matching with the contact matrix presented in the study... the second survey is from 2010 Belgium, the one the CoMix study claims to use as the baseline. Results CoMix baseline much closer to Belgium 2010 survey but slightly off.. we will use this for now
+```{r}
+
+
+
+belgium <- get_survey("https://doi.org/10.5281/zenodo.4059826")
+m3 <- contact_matrix(belgium, countries = "Belgium", age.limits = c(18,30,40,50,60,70), n=100,symmetric = T,weigh.dayofweek = T)
+mr3 <- Reduce("+", lapply(m3$matrices, function(x) {x$matrix})) / length(m3$matrices)
+df3 <- melt(mr3, varnames = c("age1", "age2"), value.name = "contacts")  %>% left_join(
+               data.frame(age1 = c(1,2,3,4,5,6),
+                          age1_cat = as.factor(c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+"))))
+
+
+
+```
+## Belgium, use POLYMOD as base
+```{r}
+m2 <- contact_matrix(polymod, countries = "Belgium", age.limits = c(18,30,40,50,60,70), n=100,symmetric=T,weigh.dayofweek = T)
+
+mr2 <- Reduce("+", lapply(m2$matrices, function(x) {x$matrix})) / length(m2$matrices)
+df2 <- melt(mr2, varnames = c("age1", "age2"), value.name = "contacts") %>% left_join(
+               data.frame(age1 = c(1,2,3,4,5,6),
+                          age1_cat = as.factor(c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+"))))
+
+ggplot(df2, aes(x = age1, y = age2, fill = contacts)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 3, limit = c(0,6))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+```
+
+```{r}
+bel_col <- df1 %>%left_join(df3, by =c("age1"="age1_cat","age2"="age2")) %>% 
+  mutate(abs_change = contacts.x-contacts.y,
+         perc_change = (contacts.x-contacts.y)/contacts.y, 
+         age1 = factor(age1,levels = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")),
+         age2 = factor(age2, levels =  c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")))
+
+png("../Plot/Panel1/2_Coletti_absolute_change_all.png",width=800, height=600,res=150)
+bel_col  %>% ggplot(aes(x = age1, y = age2, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -3, limit = c(-6,0))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme+ theme(plot.title = element_text(hjust=0.5, face="bold",size=12)) + ggtitle("Belgium")
+dev.off()
+
+png("Data/2_Coletti/percent_change_all_redo.png",width=800, height=600,res=150)
+bel_col  %>% ggplot(aes(x = age1, y = age2, fill = perc_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit =  c(-1,1))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+dev.off()
+```
+
+## Age-specific contact matrix changes by setting
+### Location-specific contact matrix for lockdown
+```{r}
+nboots <-100
+
+surveydata$contacts <- surveydata$contacts %>% mutate(
+                        cnt_school = ifelse(cnt_school =="TRUE",1,
+                                      ifelse(is.na(cnt_school),0,0)),
+                        cnt_home = ifelse(cnt_home =="TRUE",1,
+                                       ifelse(is.na(cnt_home),0,0)),  
+                        cnt_work = ifelse(cnt_work =="TRUE", 1,
+                                        ifelse(is.na(cnt_work),0,0)),
+                        cnt_school = tidyr::replace_na(cnt_school,0),
+                        cnt_home = tidyr::replace_na(cnt_home, 0),
+                        cnt_work = tidyr::replace_na(cnt_work, 0))
+
+age_limits = c(18,30,40,50,60,70)
+filter_s<- list()
+filter_s$cnt_school =1
+
+filter_h <- list()
+filter_h$cnt_home=1
+
+filter_w <- list()
+filter_w$cnt_work=1
+
+filter_o<- list()
+filter_o$cnt_school =0
+filter_o$cnt_home =0
+filter_o$cnt_work =0 
+
+list_m1<-list()
+list_m1 <- list(
+        lock_s= contact_matrix(surveydata, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_s),
+        lock_w = contact_matrix(surveydata, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_w),
+        lock_h = contact_matrix(surveydata, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_h),
+        lock_o = contact_matrix(surveydata, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_o)
+)
+
+list_mr1 <- list()
+for (i in 1:length(list_m1)){
+  list_mr1[[i]] <- Reduce("+", lapply(list_m1[[i]]$matrices, function(x) {x$matrix})) /     length(list_m1[[i]]$matrices)
+  #list_lock_m1 <- melt(list_mr1[[i]], varnames = c("part_age", "cont_age"), value.name = "contacts")       # this doesn't fit well into a list for some reason?
+}
+
+
+lock_s <- list_mr1[[1]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_w <- list_mr1[[2]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_h <- list_mr1[[3]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_o <- list_mr1[[4]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+```
+### Location-specific contact matrix for baseline
+```{r}
+list_m2 <- list(
+        base_s= contact_matrix(belgium, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_s),
+        base_w = contact_matrix(belgium, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_w),
+        base_h = contact_matrix(belgium, countries = "Belgium", age.limits = age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_h),
+        base_o = contact_matrix(belgium, countries = "Belgium", age.limits =age_limits, n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_o)
+)
+
+list_mr2 <- list()
+for (i in 1:length(list_m2)){
+  list_mr2[[i]] <- Reduce("+", lapply(list_m2[[i]]$matrices, function(x) {x$matrix})) /     length(list_m2[[i]]$matrices)
+  #list_lock_m1 <- melt(list_mr1[[i]], varnames = c("part_age", "cont_age"), value.name = "contacts")       # this doesn't fit well into a list for some reason?
+}
+
+
+base_s <- list_mr2[[1]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_w <- list_mr2[[2]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_h <- list_mr2[[3]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_o <- list_mr2[[4]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+
+res <- base_w %>% group_by(part_age)  %>% summarize(n=sum(contacts))
+res1 <- base_s %>% group_by(part_age)  %>% summarize(n=sum(contacts))
+
+mean(res1$n)
+```
+
+
+
+```{r}
+## Setting specific changes in contact patterns
+
+bel_h <- lock_h %>% 
+          left_join(base_h, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)%>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")
+
+bel_w <- lock_w %>%
+          left_join(base_w, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)%>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")
+
+bel_s <- lock_s %>%
+          left_join(base_s, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)%>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")
+
+bel_o <- lock_o %>%
+          left_join(base_o, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)%>% 
+         select(-part_age) %>%
+         rename("part_age" = "part_age_cat")
+
+max(bel_o$abs_change)
+min(bel_o$abs_change)
+
+```
+# RElative change
+```{r}
+png("Data/2_Coletti/rel_change_home.png",width=800, height=600,res=150)
+matrix_viz(bel_h)
+dev.off()
+
+png("Data/2_Coletti/rel_change_work.png",width=800, height=600,res=150)
+matrix_viz(bel_w)
+dev.off()
+png("Data/2_Coletti/rel_change_school.png",width=800, height=600,res=150)
+matrix_viz(bel_s)
+dev.off()
+
+png("Data/2_Coletti/rel_change_other.png",width=800, height=600,res=150)
+matrix_viz(bel_o)
+dev.off()
+```
+
+# Absolute change
+```{r}
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1),
+              legend.title = element_blank())
+
+png("../Plot/Panel2/2_Coletti_abs_change_home.png",width=800, height=600,res=150)
+matrix_viz(bel_h,fill="abs",limit=c(-3,0.4))
+dev.off()
+
+png("../Plot/Panel2/2_Coletti_abs_change_work.png",width=800, height=600,res=150)
+matrix_viz(bel_w, fill="abs",limit=c(-3,0))
+dev.off()
+
+png("../Plot/Panel2/2_Coletti_abs_change_school.png",width=800, height=600,res=150)
+matrix_viz(bel_s, fill="abs",limit=c(-3,0))
+dev.off()
+
+png("../Plot/Panel2/2_Coletti_abs_change_other.png",width=800, height=600,res=150)
+matrix_viz(bel_o, fill="abs",limit=c(-3,0))
+dev.off()
+```
+
+
+## Average number of contacts by location
+For baseline data, we use data from Willem et al. Among those greater than 18, average contacts at work is very high, may need to reweight on age, household size and day of week. 
+```{r}
+sum(surveydata$contacts$cnt_home)/length(surveydata$participants$part_id)
+sum(surveydata$contacts$cnt_home)/length(surveydata$participants$part_id)
+
+avg_setting_lock <- surveydata$participants %>% left_join(surveydata$contacts %>% group_by(part_id) %>%
+                                    summarize(cnt_tot =n(),
+                                              cnt_home = sum(cnt_home),
+                                              cnt_work = sum(cnt_work),
+                                              cnt_school=sum(cnt_school)), 
+                                    by= "part_id") %>%
+                            mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+
+
+cont_base <- belgium$participants %>% filter(part_age>18) 
+avg_setting_base <- cont_base %>% left_join(belgium$contacts %>% group_by(part_id) %>%
+                                  summarize(cnt_tot = n(),
+                                            cnt_home = sum(cnt_home,na.rm=T),
+                                            cnt_work = sum(cnt_work, na.rm=T),
+                                            cnt_school = sum(cnt_school, na.rm=T)),
+                                  by="part_id") %>%
+                                  mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+                                         
+
+
+avg_setting_lock %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other),
+                               se_home=sd(cnt_home)/sqrt(1542))
+
+avg_setting_base %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other))
+
+data(polymod)
+cont_base <- polymod$participants %>% filter(country=="Belgium" & part_age>18)
+avg_setting_base <- cont_base %>% left_join(polymod$contacts %>% group_by(part_id) %>%
+                                  summarize(cnt_tot = n(),
+                                            cnt_home = sum(cnt_home,na.rm=T),
+                                            cnt_work = sum(cnt_work, na.rm=T),
+                                            cnt_school = sum(cnt_school, na.rm=T)),
+                                  by="part_id") %>%
+                                  mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+                                         
+
+
+```
+
+
+
+## Belgium, use other Belgium study on Zenodo as base
+```{r}
+ggplot(df3, aes(x = age1, y = age2, fill = contacts)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 3, limit = c(0,8))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+
+bel_col <- df1 %>%left_join(df3, by =c("age1"="age1_cat","age2"="age2")) %>% 
+  mutate(abs_change = contacts.y-contacts.x,
+         perc_change = (contacts.y-contacts.x)/contacts.y, 
+         age1 = factor(age1,levels = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")),
+         age2 = factor(age2, levels =  c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")))
+
+#png("Data/2_Coletti/absolute_change_all.png",width=800, height=600,res=150)
+bel_col  %>% ggplot(aes(x = age1, y = age2, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 5, limit = c(0,10))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+#dev.off()
+
+#png("Data/2_Coletti/percent_change_all.png",width=800, height=600,res=150)
+bel_col  %>% ggplot(aes(x = age1, y = age2, fill = perc_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high ="maroon4" , mid ="navajowhite2", midpoint = 0.5, limit = c(0,1))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+#dev.off()
+
+df2
+df3
+```
+
+
+## Belgium, use excel version of that was in their preprint as the base (not sure where numbers come from) - results look weird?
+```{r}
+bel_base <- read.csv("Data/2_Coletti/Belgium2010_Flemmish.csv")
+
+bel_col <- df1 %>% left_join(bel_base, by =c("age1"="age.group","age2"="contact.age.group")) %>% 
+  mutate(abs_change = contacts.y-contacts.x,
+         perc_change = (contacts.y-contacts.x)/contacts.y, 
+         age1 = factor(age1,levels = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")),
+         age2 = factor(age2, levels =  c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")))
+
+
+#png("Data/2_Coletti/absolute_change_all.png",width=800, height=600,res=150)
+bel_col  %>% ggplot(aes(x = age1, y = age2, fill = abs_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 5, limit = c(0,10))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+#dev.off()
+
+#png("Data/2_Coletti/percent_change_all.png",width=800, height=600,res=150)
+bel_col  %>% ggplot(aes(x = age1, y = age2, fill = perc_change)) + theme(legend.position = "bottom") + 
+    scale_fill_gradient2(low = "white", high ="maroon4" , mid ="navajowhite2", midpoint = 0.5, limit = c(0,1))+
+    xlab("Age of participant")+ylab("Age of contact")+
+    geom_tile()+ theme
+#dev.off()
+
+
+```
+
+
+
+
+
+

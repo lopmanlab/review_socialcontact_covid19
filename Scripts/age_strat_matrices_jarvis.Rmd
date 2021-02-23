@@ -1,0 +1,307 @@
+---
+title: "age_strat_matrices_jarvis"
+author: "Carol Liu"
+date: "11/25/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(dplyr)
+library(kableExtra)
+library(forestplot)
+library(ggalt)
+library(plotly)
+library(forcats)
+library(ggpubr)
+library(here)
+library(socialmixr)
+library(RColorBrewer)
+library(reshape2)
+library(scales)
+
+#Data
+#Lockdown data
+uk_lock <- readRDS("../Data/5_Jarvis/comix_covid-19-first_wave/data/contact_matrices/h2020_survey.rds")
+
+#Baseline POLYMOD data
+cont <- readRDS("../Data/5_Jarvis/comix_covid-19-first_wave/data/polymod_contacts.rds")
+part <- readRDS("../Data/5_Jarvis/comix_covid-19-first_wave/data/polymod_participants.rds")
+
+#function for filtering for lockdown data
+source('cm_filter.R')
+
+#Theme for ggplot
+theme<-theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=12),
+              axis.title.x=element_text(size=12),
+              axis.title.y=element_text(size=12),
+              panel.border=element_blank(),
+              axis.text=element_text(size=11),
+              axis.text.x=element_text(angle=45,hjust=1))
+
+# Function for contact matrices
+matrix_viz <- function(df1, part_age= part_age,cont_age=cont_age, fill = "rel", midpoint, limit, title) {
+                          
+  if (fill == "rel") {                                                   # if want to plot relative change
+          
+    plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + 
+              scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit = c(-1,1))
+    
+    } else {
+              if (missing(limit)) {
+                      limit <- c(min(df1$abs_change),0)                   # if no limit specified, use the maximum value
+                } else{
+                      limit=limit                                         # otherwise use the limit specified
+  }
+   if (missing(midpoint)){
+                       mid <- (limit[1] - limit[2])/2                                      # midpoint for legend
+               }   else{
+                 mid = midpoint
+               }
+     
+      plot99 <-df1 %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = mid, limit =limit,name="Diff. in contacts pre- and during lockdown")
+            
+  }
+
+    plot99 + xlab("Age of participant")+ylab("Age of contact")+
+            geom_tile()+ theme(legend.position = "bottom") + theme + ggtitle(title)
+}
+
+
+```
+## 6. UK-Jarvis
+```{r}
+nboots <- 100    # specify the number of bootstrap iterations
+
+m1 <- cm_filter(uk_lock,boots=nboots,symmetric=T,age_limits = c(18, 30, 40, 50, 60, 70))
+mr1 <- Reduce("+", lapply(m1, function(x) {x$matrix})) / length(m1)
+uk_lock_m <- melt(mr1, varnames = c("part_age", "cont_age"), value.name = "contacts")
+
+m2 <- contact_matrix(polymod, countries = "United Kingdom", age.limits = c(18,30,40,50,60,70), n=nboots,symmetric=T,weigh.dayofweek = T)
+mr2 <- Reduce("+", lapply(m2$matrices, function(x) {x$matrix})) / length(m2$matrices)
+uk_base_m <- melt(mr2, varnames = c("part_age", "cont_age"), value.name = "contacts")
+
+uk_jar <- uk_lock_m %>% 
+          left_join(uk_base_m, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y,
+                 part_age = factor(part_age_cat,levels = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")),
+                 cont_age = factor(cont_age, levels =  c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")))
+
+png("Data/6_Jarvis/percent_change_all_sym.png",width=800, height=600,res=150)
+
+matrix_viz(uk_jar, title="UK")
+
+dev.off()
+
+png("../Plot/Panel1/5_Jarvis_absolute_change_all.png",width=800, height=600,res=150)
+
+matrix_viz(uk_jar, fill="abs", limit=c(-6,0.3), mid=-3.5, title="UK")
+
+dev.off()
+
+uk_jar %>% ggplot(aes(x = part_age, y = cont_age, fill = abs_change)) + 
+            scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -3, limit =c(-6,0.3), name="Diff. in contacts\npre- and during\n lockdown", guide = guide_legend(nrow=3))+ 
+  geom_tile()+ theme(legend.position = "right")
+
+#uk_jar  %>% ggplot(aes(x = part_age_cat, y = cont_age, fill = abs_change)) + theme(legend.position = "bottom") + 
+#    scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 2.5, limit = c(0,5))+
+#    xlab("Age of participant")+ylab("Age of contact")+
+#    geom_tile()+ theme
+#uk_jar  %>% ggplot(aes(x = part_age_cat, y = cont_age, fill = perc_change)) + theme(legend.position = "bottom") + 
+#    scale_fill_gradient2(low = "white", high ="maroon4" , mid ="navajowhite2", midpoint = 0.5, limit = c(0,1))+
+#    xlab("Age of participant")+ylab("Age of contact")+
+#    geom_tile()+ theme
+```
+
+### Location specific for lockdown matrices
+```{r}
+age_limits = c(18, 30, 40, 50, 60, 70)
+
+list_m1 <- list(
+              lock_s = cm_filter(uk_lock,boots=nboots,symmetric=T,age_limits = age_limits, filter=TRUE, school = "Yes"),
+              lock_w = cm_filter(uk_lock,boots=nboots,symmetric=T,age_limits = age_limits, filter=TRUE, work = "Yes"),
+              lock_h = cm_filter(uk_lock,boots=nboots,symmetric=T,age_limits = age_limits, filter=TRUE, home = "Yes"),
+              lock_o = cm_filter(uk_lock,boots=nboots,symmetric=T,age_limits = age_limits, 
+                               filter=TRUE, work = "No", school = "No", home = "No")
+                )
+
+
+list_mr1 <- list()
+list_lock_m1 <- list()
+
+for (i in 1:length(list_m1)){
+  list_mr1[[i]] <- Reduce("+", lapply(list_m1[[i]], function(x) {x$matrix})) / length(list_m1[[i]])
+  #list_lock_m1 <- melt(list_mr1[[i]], varnames = c("part_age", "cont_age"), value.name = "contacts")       # this doesn't fit well into a list for some reason?
+}
+
+lock_s <- list_mr1[[1]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_w <- list_mr1[[2]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_h <- list_mr1[[3]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+lock_o <- list_mr1[[4]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+```
+
+#### Location specific for polymod base matrices
+```{r}
+filter_s<- list()
+filter_s$cnt_school =1
+
+filter_h <- list()
+filter_h$cnt_home=1
+
+filter_w <- list()
+filter_w$cnt_work=1
+
+filter_o<- list()
+filter_o$cnt_school =0
+filter_o$cnt_home =0
+filter_o$cnt_work =0 
+
+list_m2 <- list(
+        base_s= contact_matrix(polymod, countries = "United Kingdom", age.limits = c(18,30,40,50,60,70), n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_s),
+        base_w = contact_matrix(polymod, countries = "United Kingdom", age.limits = c(18,30,40,50,60,70), n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_w),
+        base_h = contact_matrix(polymod, countries = "United Kingdom", age.limits = c(18,30,40,50,60,70), n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_h),
+        base_o = contact_matrix(polymod, countries = "United Kingdom", age.limits = c(18,30,40,50,60,70), n=nboots,symmetric=T,weigh.dayofweek = T, filter = filter_o)
+)
+
+list_mr2 <- list()
+for (i in 1:length(list_m2)){
+  list_mr2[[i]] <- Reduce("+", lapply(list_m2[[i]]$matrices, function(x) {x$matrix})) /     length(list_m2[[i]]$matrices)
+  #list_lock_m1 <- melt(list_mr1[[i]], varnames = c("part_age", "cont_age"), value.name = "contacts")       # this doesn't fit well into a list for some reason?
+}
+
+
+base_s <- list_mr2[[1]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_w <- list_mr2[[2]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_h <- list_mr2[[3]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+base_o <- list_mr2[[4]] %>% melt(varnames = c("part_age", "cont_age"), value.name = "contacts")
+```
+## Setting specific changes in contact patterns
+
+```{r}
+uk_h <- lock_h %>% 
+          left_join(base_h, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y) %>%
+          select(-part_age) %>%
+          rename("part_age" = "part_age_cat")
+
+uk_w <- lock_w %>%
+          left_join(base_w, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)  %>%
+          select(-part_age) %>%
+          rename("part_age" = "part_age_cat")
+
+uk_s <- lock_s %>%
+          left_join(base_s, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)  %>%
+          select(-part_age) %>%
+          rename("part_age" = "part_age_cat")
+
+uk_o <- lock_o %>%
+          left_join(base_o, by=c("part_age"="part_age","cont_age"="cont_age")) %>%
+          left_join(data.frame(part_age = seq(1:6),
+                               part_age_cat = c("[18,30)","[30,40)","[40,50)","[50,60)","[60,70)","70+")), by="part_age") %>%
+          mutate(abs_change = contacts.x-contacts.y,
+                 perc_change= (contacts.x-contacts.y)/contacts.y)  %>%
+          select(-part_age) %>%
+          rename("part_age" = "part_age_cat")
+
+```
+# RElative change
+```{r}
+png("Data/6_Jarvis/rel_change_home.png",width=800, height=600,res=150)
+matrix_viz(uk_h)
+dev.off()
+
+png("Data/6_Jarvis/rel_change_work.png",width=800, height=600,res=150)
+matrix_viz(uk_w)
+dev.off()
+png("Data/6_Jarvis/rel_change_school.png",width=800, height=600,res=150)
+matrix_viz(uk_s)
+dev.off()
+
+png("Data/6_Jarvis/rel_change_other.png",width=800, height=600,res=150)
+matrix_viz(uk_o)
+dev.off()
+```
+
+# Absolute change
+```{r}
+png("Data/6_Jarvis/abs_change_home.png",width=800, height=600,res=150)
+matrix_viz(uk_h,fill="abs",limit=c(-1.5,0))
+dev.off()
+png("Data/6_Jarvis/abs_change_work.png",width=800, height=600,res=150)
+matrix_viz(uk_w, fill="abs",limit=c(-1.5,0))
+dev.off()
+png("Data/6_Jarvis/abs_change_school.png",width=800, height=600,res=150)
+matrix_viz(uk_s, fill="abs",limit=c(-1.5,0))
+dev.off()
+png("Data/6_Jarvis/abs_change_other.png",width=800, height=600,res=150)
+matrix_viz(uk_o, fill="abs",limit=c(-1.5,0))
+dev.off()
+```
+
+## Average contacts by setting
+```{r}
+uk_lock$contacts <- uk_lock$contacts %>% mutate(
+                        cnt_school = ifelse(cnt_school =="Yes",1,0),
+                        cnt_home = ifelse(cnt_home =="Yes",1,0),
+                        cnt_work = ifelse(cnt_work =="Yes",1,0))
+
+
+avg_setting_lock <- uk_lock$participants %>% left_join(uk_lock$contacts %>% group_by(part_id) %>%
+                                    summarize(cnt_tot =n(),
+                                              cnt_home = sum(cnt_home),
+                                              cnt_work = sum(cnt_work),
+                                              cnt_school=sum(cnt_school)), 
+                                    by= "part_id") %>%
+                            mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+
+
+data(polymod)
+polymod
+cont_base <- polymod$participants %>% filter(country=="United Kingdom", part_age>18)
+avg_setting_base <- cont_base %>% left_join(polymod$contacts %>% group_by(part_id) %>%
+                                  summarize(cnt_tot = n(),
+                                            cnt_home = sum(cnt_home,na.rm=T),
+                                            cnt_work = sum(cnt_work, na.rm=T),
+                                            cnt_school = sum(cnt_school, na.rm=T)),
+                                  by="part_id") %>%
+                                  mutate(cnt_home = tidyr::replace_na(cnt_home,0),
+                                   cnt_work = tidyr::replace_na(cnt_work,0),
+                                   cnt_school = tidyr::replace_na(cnt_school,0),
+                                   cnt_tot = tidyr::replace_na(cnt_tot,0)) %>%
+                            mutate(cnt_other = cnt_tot-(cnt_home+cnt_work+cnt_school))
+                                         
+
+
+avg_setting_lock %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other))
+avg_setting_base %>% summarize(avg_home = mean(cnt_home),
+                                           avg_work = mean(cnt_work),
+                                           avg_school = mean(cnt_school),
+                                           avg_oth = mean(cnt_other))
+```
+

@@ -1,0 +1,600 @@
+---
+title: "analysis"
+author: "Carol Liu"
+date: "9/30/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readxl)
+library(dplyr)
+library(kableExtra)
+library(forestplot)
+library(ggalt)
+library(plotly)
+library(forcats)
+library(ggpubr)
+library(viridis)
+library(tidyr)
+library(hrbrthemes)
+```
+
+## R Markdown
+
+```{r}
+study <- read_excel("../Data/Data.xlsx",sheet = "Inc_studies")
+res <- read_excel("../Data/Data_origdraft.xlsx", sheet = "Results description")
+meta <- read_excel("../Data/Data.xlsx", sheet = "PreCOV vs Lockdown")
+stratified <- read_excel("../Data/Data.xlsx",sheet = "Strat_change")
+
+tab_names <- excel_sheets("../Data/OxCGRT_timeseries_all.xlsx")
+list_all <- lapply(tab_names, function(x) read_excel(path = "../Data/OxCGRT_timeseries_all.xlsx", sheet = x))
+
+colnames(study)
+
+study %>% group_by(`Study Subjects`) %>%summarize(n=n()) %>% mutate(prop = n/sum(n))
+
+study %>% group_by(`Study Design`) %>%summarize(n=n()) %>% mutate(prop = n/sum(n))
+
+study %>% group_by(`Collection Mode`) %>%summarize(n=n()) %>% mutate(prop = n/sum(n))
+
+10/12
+getwd()
+
+                
+
+
+
+stratified
+```
+
+
+```{r}
+res %>% filter (Cat !="Other") %>%
+  group_by(SN,Cat) %>% summarize(n=n()) %>% 
+  mutate(n=1) %>% group_by(Cat) %>% summarize(n=n()) %>%
+  arrange(desc(n)) %>%
+  left_join(data.frame(Cat = unique(res$Cat),
+                       Result = c("Age-stratified matrices", "Average contacts by age", "Other",
+                              "Average contacts by day", "Average contacts by education",
+                              "Average contacts by gender/sex", "Average contacts by HH size",
+                              "Average contacts by income" , "Average contacts by occ/prof",
+                               "Average contacts by setting", "Assassortative index",
+                               "Percent masked", "Percent contact reduction", "R0")),
+                        by="Cat") %>%
+                        select(Result, n) %>%
+                        rename("Num. Studies Reporting"=n) %>%
+                        kable()
+```
+
+## Dumbbell plot redo
+```{r}
+#s <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/school_earnings.csv")
+# order factor levels by men's income (plot_ly() will pick up on this ordering)
+#s$School <- factor(s$School, levels = s$School[order(s$Men)])
+
+meta <- meta %>% arrange(SN) %>%
+        mutate(mean_lckdown = as.numeric(mean_lckdown),
+               mean_precovid = as.numeric(mean_precovid)) %>%
+        filter(region_study!= "Kenya")
+fig <- plot_ly(meta, color = I("gray80")) %>% 
+      add_segments(x = ~mean_precovid, xend = ~mean_lckdown, y = ~region_study, yend = ~region_study, showlegend = FALSE)%>% 
+      add_markers(x = ~mean_precovid, y = ~region_study, name = "Mean Pre-COVID", color = I("pink"), size=1.3) %>% 
+      add_markers(x = ~mean_lckdown, y = ~region_study, name = "Mean Lockdown", color = I("blue"), size=1.3) %>% 
+    layout(
+    title = "Mean contacts per person per day pre-COVID and during lockdown",
+    xaxis = list(title = "Mean contacts per person per day"),
+    yaxis = list(title = "Region_study"),
+    margin = list(l = 65)
+  )
+
+png("../Plot/mean_contacts_pre_lckdown.png")
+fig
+dev.off()
+
+```
+
+
+## Dumbell plot for percent change in avg contacts
+```{r}
+
+# health$Area <- factor(health$Area)
+gg <- ggplot(meta, aes(x=mean_precovid, xend=mean_lckdown, y=region_study, group=region_study))+          
+      geom_dumbbell(size=1.0, color="#b2b2b2", size_x=3.0, size_xend = 3.0, colour_x = "pink", colour_xend = "royalblue2") + 
+        #scale_x_continuous(label=seq(1,18,by=2)) + 
+        labs(x=NULL, 
+             y=NULL, 
+             title="Mean contacts per person per day pre-COVID and during lockdown")+
+             #subtitle="Pct Change: 2013 vs 2014") +
+        xlab("Mean contacts per day")+theme
+       
+png("../Plot/mean_contacts_pre_lckdown.png")
+plot(gg)
+dev.off()
+```
+
+## Percent reduction in contacts dot plot
+```{r}
+
+png("../Plot/perc_reduction_pre_lckdown.png")
+ggplot(meta, aes(x=perc_red_contacts, y=region_study)) + 
+  geom_point(col="tomato2", size=4) +   # Draw points
+  #geom_segment(aes(x=perc_red_contacts, 
+  #                 xend=perc_red_contacts, 
+  #                 y=min(perc_red_contacts), 
+  #                 yend=max(perc_red_contacts)), 
+  #             linetype="dashed", 
+  #             size=0.1) +   # Draw dashed lines
+  labs(title="Percent reduction in mean contacts (for reference)") +
+  xlab("Percent reduction in contacts") +
+  ylab("Region_Study")+
+  theme_bw() +
+  theme(axis.text=element_text(size=12))
+
+dev.off()
+
+meta<- meta %>% arrange(R0_red) 
+order<- unique(meta$region_study)
+meta$region_study <- factor(meta$region_study, levels=order)
+
+png("../Plot/perc_reduction_pre_lckdown_ref.png")
+
+
+meta%>%
+  filter(!is.na(R0_red)) %>%
+  ggplot(aes(x=perc_red_contacts, y=region_study)) + 
+  #geom_point(col="tomato2", size=4) +   # Draw points
+  geom_point(col="gray", size=4) +   # Draw points
+  labs(title="Percent reduction in mean contacts (for reference)") +
+  xlab("Percent reduction in contacts") +
+  ylab("Region_Study")+
+  theme_bw() +
+  theme(axis.text=element_text(size=12))
+
+dev.off()
+```
+
+## R0
+```{r}
+png("../Plot/perc_reduction_RO.png")
+meta%>%
+  filter(!is.na(R0_red))%>%
+  ggplot(aes(x=R0_red, y=region_study)) + 
+  geom_point(col="gray", size=4) +   # Draw points
+  geom_point(col="tomato2", size=4) +   # Draw points
+  #geom_segment(aes(x=perc_red_contacts, 
+  #                 xend=perc_red_contacts, 
+  #                 y=min(perc_red_contacts), 
+  #                 yend=max(perc_red_contacts)), 
+  #             linetype="dashed", 
+  #             size=0.1) +   # Draw dashed lines
+  labs(title="Percent reduction in R0") + 
+  theme_bw() +
+  theme(axis.text=element_text(size=12)) + xlab("% reduction in R0") + ylab("Study region")
+dev.off()
+
+```
+
+```{r}
+study <- stratified[stratified$SN==111 & stratified$Strata=="age", ] %>% select(mean_precovid, mean_lckdown, mean_post, strata_cat) %>% rename(cat=strata_cat)
+
+ggplot() +
+  # reshape the data frame & get min value so you can draw an eye-tracking line (this is one geom)
+  geom_segment(
+    data = gather(study, measure, mean, -cat) %>% 
+      group_by(cat) %>% 
+      top_n(-1) %>% 
+      slice(1) %>%
+      ungroup(),
+    aes(x = 0, xend = mean, y = cat, yend = cat),
+    linetype = "dotted", size = 0.5, color = "gray80"
+  ) +
+  # reshape the data frame & get min/max category meanues so you can draw the segment (this is another geom)
+  geom_segment(
+    data = gather(study, measure, mean, -cat) %>% 
+      group_by(cat) %>% 
+      summarise(start = range(mean)[1], end = range(mean)[2]) %>% 
+      ungroup(),
+    aes(x = start, xend = end, y = cat, yend = cat),
+    color = "gray80", size = 1
+  ) +
+  # reshape the data frame & plot the points
+  geom_point(
+    data = gather(study, measure, mean, -cat),
+    aes(mean, cat, color = measure), 
+    size = 3
+  ) +
+  # i just extended the scale a bit + put axis on top; choose aesthetics that work 
+  # for you
+  scale_x_comma(position = "bottom", limits = c(0, 27)) +
+  scale_colour_manual(values = c("#2171B5","black","#C6DBEF"), name = "Mean contact",labels = c("Lockdown","Post-lockdown","Pre-lockdown"))+
+  #scale_color_ipsum(name = "A real legend title") +
+  labs(
+    x = "Description of the value", y = NULL,
+    title = "A good plot title"
+  ) +
+  theme +
+  theme(legend.position = "right")
+```
+
+
+## Age stratified reduction in contacts
+```{r}
+theme<- theme_classic()+
+        theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+              axis.title.x=element_text(size=8),
+              #axis.title.y = element_text(size-8),
+              #plot.background=element_rect(fill="#f7f7f7"),
+              #panel.background=element_rect(fill="#f7f7f7"),
+              panel.grid.minor=element_blank(),
+              panel.grid.major.y=element_blank(),
+              panel.grid.major.x=element_line(),
+              axis.ticks=element_blank(),
+              legend.position="top",
+              panel.border=element_blank())
+          #theme(axis.text=element_text(size=8))
+        
+
+theme_red <- theme(axis.title.x = element_blank(),
+                   axis.title.y = element_blank())
+
+p <- stratified[stratified$SN==1 & stratified$Strata=="age", ]  %>% select(strata_cat, mean_precovid, mean_lckdown, mean_post) %>%tidyr::gather(measure, mean, -strata_cat) %>%
+ ggplot() +geom_point(aes(x=mean,y=strata_cat, color=measure), size =3) +
+  #scale_colour_manual(values = c("#2171B5","#8ab5de","grey80"), name = "Mean contact",labels =
+  scale_colour_manual(values = c("#2171B5","grey60","#C6DBEF"), name = "Mean contact",labels =
+  c("Lockdown","Post-lockdown","Pre-lockdown")) +
+  theme_bw()+theme(legend.text = element_text(size = 10), legend.title = element_text(size = 10))
+  
+legend <- get_legend(p)
+
+# Short script to get maximum number of contacts 
+max<-data.frame(name=rep(NA,length(SN)), max = rep(NA, length(SN)))
+for (i in 1:length(SN)){
+  study <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="age", ] %>% 
+    select(mean_precovid, mean_lckdown, mean_post, strata_cat)
+  max$name[[i]] <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="age", ]$name[1]
+   max$max[[i]]<- max(study$mean_precovid)
+}
+```
+
+```{r}
+
+age_plots <- list()
+age_red <- list()
+
+SN <- c(1,2,31,33,35,36,37,4,6,7,10,111,112,121,122,32)
+for (i in 1:length(SN)){
+  name <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="age", ]$name[1]
+  study <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="age", ] %>% 
+    select(mean_precovid, mean_lckdown, mean_post, strata_cat)
+  
+  if(max(study$mean_precovid)<=17){
+    max <-17
+  } else if (max(study$mean_precovid)<=28.5) {
+    max<- 29
+  } else {
+    max <- 35
+  }
+  
+  if (is.na(study$mean_post)[[1]]) {
+    age_plots[[i]] <- ggplot(study, aes(x=mean_precovid, xend=mean_lckdown, y=strata_cat, group=strata_cat))+          
+      geom_dumbbell(size=1.0, color="gray86", size_x=3.0, size_xend = 3.0, colour_x = "#C6DBEF" , colour_xend = "#2171B5") + 
+      scale_x_continuous(breaks = seq(0,max,by=4), labels = seq(0,max,by=4), limits=c(0,max)) +
+      labs(x=NULL, 
+           y=NULL, 
+           title=paste(name))+theme
+  } else {
+    
+    age_plots[[i]] <- ggplot() +
+      # reshape the data frame & get min value so you can draw an eye-tracking line (this is one geom)
+      geom_segment(
+        data = gather(study, measure, mean, -strata_cat) %>% 
+          group_by(strata_cat) %>% 
+          top_n(-1) %>% 
+          slice(1) %>%
+          ungroup(),
+        aes(x = 0, xend = mean, y = strata_cat, yend = strata_cat),
+        linetype = "dotted", size = 0.5, color = "gray86"
+      ) +
+      # reshape the data frame & get min/max strata_category meanues so you can draw the segment (this is another geom)
+      geom_segment(
+        data = gather(study, measure, mean, -strata_cat) %>% 
+          group_by(strata_cat) %>% 
+          summarise(start = range(mean)[1], end = range(mean)[2]) %>% 
+          ungroup(),
+        aes(x = start, xend = end, y = strata_cat, yend = strata_cat),
+        color = "gray80", size = 1
+      ) +
+      # reshape the data frame & plot the points
+      geom_point(
+        data = gather(study, measure, mean, -strata_cat),
+        aes(mean, strata_cat, color = measure), 
+        size = 3
+      ) +
+      # i just extended the scale a bit + put axis on top; choose aesthetics that work 
+      # for you
+      scale_x_comma(position = "bottom", breaks = seq(0,max,by=4), labels = seq(0,max,by=4),limits = c(0, max)) +
+      scale_colour_manual(values = c("#2171B5","grey60","#C6DBEF"), name = "Mean contact",labels = c("Lockdown","Post-lockdown","Pre-lockdown"))+
+      #scale_color_ipsum(name = "A real legend title") +
+      labs(
+        x = NULL, y = NULL,
+        title = paste(name)
+      ) +
+      theme +
+      theme(legend.position = "right")
+  }
+    
+  # xlab("Mean contacts per person per day")
+  age_red[[i]] <- study%>%
+    ggplot(aes(x=round(perc_red_lckdown*100,digits=2), y=strata_cat)) + 
+    geom_point(col="tomato2", size=4) +   # Draw points
+    labs(title=study$name[1]) +
+    scale_x_continuous(limits=c(30,95))+
+    theme_bw() + theme_red
+  #theme(axis.text=element_text(size=12))
+}
+
+png("../Plot/age_strat_mean_contacts_pre_lckdown_redo2.png",height = 11,width = 12, units = 'in',res=600)
+ggarrange(age_plots[[12]], age_plots[[13]],age_plots[[14]],age_plots[[15]],
+          age_plots[[5]],age_plots[[2]],age_plots[[3]],age_plots[[16]],
+          age_plots[[1]],age_plots[[6]],age_plots[[4]],age_plots[[8]],
+          age_plots[[10]], age_plots[[9]], age_plots[[7]],
+          age_plots[[11]],legend = "right",legend.grob = legend, ncol = 4,nrow=5)
+dev.off()
+
+## Percent reduction in contacts
+png("../Plot/age_strat_perc_red_redo1.png",height = 8,width = 12, units = 'in',res=600)
+ggarrange(age_red[[1]],age_red[[2]],age_red[[3]],age_red[[4]],
+          age_red[[5]],age_red[[6]],age_red[[7]],age_red[[8]],
+          age_red[[9]],age_red[[10]],age_red[[11]],age_red[[12]],age_red[[13]],ncol = 5,nrow=3)
+dev.off()
+
+
+
+```
+
+## HH-size stratified reduction in contacts
+```{r}
+hh_plots <- list()
+hh_red <- list()
+
+SN <- c(1,2,6,7,111,112)
+for (i in 1:length(SN)){
+  study <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="hhsize", ]
+  hh_plots[[i]] <- ggplot(study, aes(x=mean_precovid, xend=mean_lckdown, y=strata_cat, group=strata_cat))+          
+      geom_dumbbell(size=1.0, color="#b2b2b2", size_x=3.0, size_xend = 3.0, colour_x = "#C6DBEF" , colour_xend = "#2171B5") + 
+        labs(x=NULL, 
+             y=NULL, 
+             title=paste(study$name[1]))+theme
+    hh_red[[i]] <- study%>%
+                    ggplot(aes(x=round(perc_red_lckdown*100,digits=2), y=strata_cat)) + 
+                    geom_point(col="tomato2", size=4) +   # Draw points
+                   # scale_x_continuous(limits=c(60,95))+
+                    labs(title=study$name[1]) +
+                    theme_bw() +theme_red
+}
+
+png("../Plot/hh_strat_mean_contacts_pre_lckdown.png",height = 8,width = 12, units = 'in',res=600)
+ggarrange(hh_plots[[1]],hh_plots[[2]],hh_plots[[3]],hh_plots[[4]],
+          hh_plots[[5]],hh_plots[[6]],legend = "right",legend.grob = legend)
+dev.off()
+
+png("../Plot/hh_strat_perc_red.png")
+ggarrange(hh_red[[1]],hh_red[[2]],hh_red[[3]],hh_red[[4]],
+          hh_red[[5]],hh_red[[6]])
+dev.off()
+```
+
+## Gender stratified reduction in contacts
+```{r}
+gender_plots <- list()
+gender_red <- list()
+
+SN <- c(1,2,6,10,111,112)
+for (i in 1:length(SN)){
+  study <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="gender", ]
+  gender_plots[[i]] <- ggplot(study, aes(x=mean_precovid, xend=mean_lckdown, y=strata_cat, group=strata_cat))+          
+      geom_dumbbell(size=1.0, color="#b2b2b2", size_x=3.0, size_xend = 3.0, colour_x = "#C6DBEF" , colour_xend = "#2171B5") + 
+        labs(x=NULL, 
+             y=NULL, 
+             title=paste(study$name[1]))+theme
+   gender_red[[i]] <- study%>%
+                    ggplot(aes(x=round(perc_red_lckdown*100,digits=2), y=strata_cat)) + 
+                    geom_point(col="tomato2", size=4) +   # Draw points
+                    scale_x_continuous(limits=c(60,95))+
+                    labs(title=study$name[1]) +
+                    theme_bw() +theme_red
+}
+
+png("../Plot/gender_strat_mean_contacts_pre_lckdown.png", height = 8,width = 12, units = 'in',res=600)
+ggarrange(gender_plots[[1]],gender_plots[[2]],gender_plots[[3]],gender_plots[[4]],
+          gender_plots[[5]],gender_plots[[6]], legend = "right",legend.grob = legend)
+dev.off()
+
+png("../Plot/gender_strat_perc_red.png")
+ggarrange(gender_red[[1]],gender_red[[2]],gender_red[[3]],gender_red[[4]],
+          gender_red[[5]],gender_red[[6]])
+dev.off()
+```
+
+## Location stratified reduction in contacts
+```{r}
+loc_plots <- list()
+loc_red <- list()
+
+SN <- c(2,31,111,121,122,33,7,35,1,36,6,37)
+for (i in 1:length(SN)){
+  study <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="place", ]
+  loc_plots[[i]] <- ggplot(study, aes(x=mean_precovid, xend=mean_lckdown, y=strata_cat, group=strata_cat))+          
+      geom_dumbbell(size=1.0, color="#b2b2b2", size_x=3.0, size_xend = 3.0, colour_x = "#C6DBEF" , colour_xend = "#2171B5") + 
+        labs(x=NULL, 
+             y=NULL, 
+             title=paste(study$name[1]))+theme
+  loc_red[[i]] <- study%>%
+                    ggplot(aes(x=round(perc_red_lckdown*100,digits=2), y=strata_cat)) + 
+                    geom_point(col="tomato2", size=4) +   # Draw points
+                    scale_x_continuous(limits=c(-20,100))+
+                    labs(title=study$name[1]) +
+                    theme_bw() +theme_red
+}
+
+png("../Plot/loc_strat_mean_contacts_pre_lckdown.png", height = 8,width = 12, units = 'in',res=600)
+ggarrange(loc_plots[[1]],loc_plots[[2]],loc_plots[[3]],loc_plots[[4]],loc_plots[[5]],loc_plots[[6]],loc_plots[[7]],loc_plots[[8]],
+          loc_plots[[9]],loc_plots[[10]],loc_plots[[11]],loc_plots[[12]],legend = "right",legend.grob = legend)
+dev.off()
+
+png("../Plot/loc_strat_perc_red.png", height = 8,width = 12, units = 'in',res=600)
+ggarrange(loc_red[[1]],loc_red[[2]],loc_red[[3]],loc_red[[4]],loc_red[[5]],loc_red[[6]],loc_red[[7]],loc_red[[8]],loc_red[[9]],
+          loc_red[[10]],loc_red[[11]],loc_red[[12]])
+dev.off()
+```
+
+## Assortativity - Dumbbell
+```{r}
+
+png("Plot/assortativity.png")
+
+   meta %>% filter(!is.na(Pre_COVID_Q)) %>%
+    ggplot(aes(x=Pre_COVID_Q, xend=Post_COVID_Q, y=region_study, group=region_study))+          
+      geom_dumbbell(size=1.0, color="#b2b2b2", size_x=3.5, size_xend = 3.5, colour_x = "pink", colour_xend = "royalblue2") + 
+        #scale_x_continuous(label=seq(1,18,by=2)) + 
+        labs(x=NULL, 
+             y=NULL, 
+             title="Q-index pre-COVID and during lockdown")+
+             #subtitle="Pct Change: 2013 vs 2014") +
+        theme_bw()+
+        theme(axis.text=element_text(size=12))
+
+dev.off()
+
+```
+## Mobility
+
+```{r}
+long<- read_excel("Data.xlsx", sheet = "Long1")
+
+lu_mob <- read.csv("../5_Mobility/2020_LU_Region_Mobility_Report.csv")
+be_mob <-read.csv("../5_Mobility/2020_BE_Region_Mobility_Report.csv")
+uk_mob <- read.csv("../5_Mobility/2020_GB_Region_Mobility_Report.csv")
+it_mob <- read.csv("../5_Mobility/2020_IT_Region_Mobility_Report.csv")
+ggplot(lu_mob, aes(x=as.Date(date),y=workplaces_percent_change_from_baseline,))+
+  geom_line()
+
+ggplot(be_mob, aes(x=as.Date(date),y=workplaces_percent_change_from_baseline,))+
+  geom_line()
+
+ggplot(uk_mob, aes(x=as.Date(date),y=workplaces_percent_change_from_baseline,))+
+  geom_line()
+
+
+ggplot(it_mob, aes(x=as.Date(date),y=workplaces_percent_change_from_baseline,))+
+  geom_line()
+
+
+```
+
+
+
+## Forrest plots
+```{r}
+meta <- meta %>% filter(!is.na(perc_red_contacts))
+
+stratOR<- 
+  structure(list(
+    mean  = c(NA,NA,meta$R0_red), 
+    lower = c(NA,NA,meta$R0_red_lo),
+    upper = c(NA,NA,meta$R0_red_hi)),
+    .Names = c("mean","lower","upper"), 
+    row.names = c(NA, -19L), #No. of rows plus 2 (for the two NAs)
+    class = "data.frame")
+
+
+tabletext<-cbind(
+  c("","Country",meta$`Country/Region`),
+  c("","OR Severe Dengue", meta$perc_red_contacts))
+
+sevdeng_forest_plot<-forestplot(tabletext, 
+                         stratOR,new_page = TRUE,
+                         #is.summary=c(TRUE,TRUE,rep(FALSE,5),TRUE),
+                         is.summary=FALSE,
+                         #clip=c(0.1,max(sevdeng_forest[,10])), 
+                         txt_gp = fpTxtGp(gpar(cex=0.85)),
+                         xlog=TRUE, 
+                         col=fpColors(box="royalblue",line="darkblue", summary="royalblue"))
+
+stratOR
+
+```
+
+## COVID government restriction tracker index during study period
+```{r}
+library(tidyr)
+
+
+df <- list_all[[1]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA","ZAF")) %>% select(1:366) %>% gather(date, value, '01Jan2020':'29Dec2020') %>%
+ mutate(date1 = rep(as.Date("2020-01-01"):as.Date("2020-12-29"), each =12),
+        date1 = as.Date(date1, origin = "1970-01-01"),
+        week = rep(1:52, each =84))
+
+df %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Government stringency")
+
+saveRDS(df,"govt_stringency.RDS")
+
+
+```
+
+
+```{r}
+df %>% group_by(country_code, week) %>% summarize(mean=mean(value)) %>% spread(key = country_code, value=mean)%>%mutate(week1=week1)
+
+df1 <- list_all[[5]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA")) %>% select(1,24:205) %>% gather(date, value, '22Jan2020':'21Jul2020') %>%
+ mutate(date1 = rep(1:182, each =11), week = rep(1:13, each =154))
+df1%>% group_by(country_code, week) %>% summarize(mean=mean(value)) %>% spread(key = country_code, value=mean)%>%mutate(week1=week1) %>% write.csv("schoolclosure.csv")
+
+
+df2 <- list_all[[7]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA")) %>% select(1,24:205) %>% gather(date, value, '22Jan2020':'21Jul2020') %>%
+ mutate(date1 = rep(1:182, each =11), week = rep(1:13, each =154))
+df2 %>% group_by(country_code, week) %>% summarize(mean=mean(value)) %>% spread(key = country_code, value=mean)%>%mutate(week1=week1) %>% write.csv("workclosure.csv")
+
+
+df3 <- list_all[[9]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA")) %>% select(1:366) %>% gather(date, value, '22Jan2020':'31Dec2020') %>%
+ mutate(date1 = rep(1:182, each =11), week = rep(1:13, each =154))
+
+df4 <- list_all[[11]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA")) %>%select(1,24:205) %>% gather(date, value, '22Jan2020':'21Jul2020') %>%
+ mutate(date1 = rep(1:182, each =11), week = rep(1:13, each =154))
+df4 %>% group_by(country_code, week) %>% summarize(mean=mean(value)) %>% spread(key = country_code, value=mean)%>%mutate(week1=week1) %>% write.csv("restrictgatherings.csv")
+
+
+df5 <- list_all[[13]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA")) %>% select(1,24:205) %>% gather(date, value, '22Jan2020':'21Jul2020') %>%
+ mutate(date1 = rep(1:182, each =11), week = rep(1:13, each =154))
+
+df6 <- list_all[[15]] %>% filter(country_code %in% c("BEL", "CHN", "FRA","DEU", "GRC","KEN","LUX","ITA","NLD","GBR","USA")) %>%select(1,24:205) %>% gather(date, value, '22Jan2020':'21Jul2020') %>%
+ mutate(date1 = rep(1:182, each =11), week = rep(1:13, each =154))
+df6 %>% group_by(country_code, week) %>% summarize(mean=mean(value)) %>% spread(key = country_code, value=mean)%>%mutate(week1=week1) %>% write.csv("stayhome.csv")
+
+
+
+df1 %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("School closure")
+df2 %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Work closure")
+df3 %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Cancel public events")
+df4 %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Restrict gatherings")
+df5 %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Close public transport")
+df6 %>% ggplot(aes(x=date1, y=value, group = country_code,colour=country_code)) + geom_line(aes(x=date1, y=value)) + ggtitle("Stay at home")
+
+
+
+
+getwd()
+
+tab_names
+ 181/14
+182/14
+
+182*11
+
+14*11
+
+ strt+14*13
+```
+
