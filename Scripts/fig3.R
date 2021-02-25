@@ -6,18 +6,16 @@ stratified <- read_excel("Data/Data.xlsx",sheet = "Strat_change") #Load stratifi
 ## Plot themes
 ##lkjasdlkajsd
 theme<- theme_classic()+
-  theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+  theme(plot.title = element_text(hjust=0.5, face="bold",size=13),
         axis.title.x=element_text(size=8),
-        #axis.title.y = element_text(size-8),
-        #plot.background=element_rect(fill="#f7f7f7"),
-        #panel.background=element_rect(fill="#f7f7f7"),
+        axis.text = element_text(size=13),
         panel.grid.minor=element_blank(),
         panel.grid.major.y=element_blank(),
         panel.grid.major.x=element_line(),
         axis.ticks=element_blank(),
         legend.position="top",
         panel.border=element_blank())
-#theme(axis.text=element_text(size=8))
+
 
 theme_red <- theme(axis.title.x = element_blank(),
                    axis.title.y = element_blank())
@@ -28,9 +26,9 @@ p <- stratified[stratified$SN==2 & stratified$Strata=="place", ]  %>%
   mutate(measure = factor(measure, levels=c("mean_precovid","mean_lckdown","mean_post","mean_post2"))) %>%
   ggplot() +geom_point(aes(x=mean,y=strata_cat, color=measure), size =3) +
   scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
-                      labels = c("Pre-lockdown","Lockdown","1-month post-lockdown","2+ month post-lockdown"))+
+                      labels = c("Pre-COVID","Lockdown (Spring 2020)","1-month post-relax","2+ month post-relax"))+
   
-  theme_bw()+theme(legend.text = element_text(size = 10), legend.title = element_text(size = 10))
+  theme_bw()+theme(legend.text = element_text(size = 12), legend.title = element_text(size = 12))
 
 legend <- get_legend(p)
 
@@ -102,14 +100,14 @@ for (i in 1:length(SN)){
     # for you
     scale_x_comma(position = "bottom", breaks = seq(0,max,by=4), labels = seq(0,max,by=4),limits = c(0, max)) +
     scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
-                        labels = c("Pre-lockdown","Lockdown","1-month post-lockdown","2+ month post-lockdown"))+
+                        labels = c("Pre-COVID","Lockdown (Spring 2020)","1-month post-relax","2+ month post-relax"))+
     #scale_color_ipsum(name = "A real legend title") +
     labs(
       x = NULL, y = NULL,
       title = paste(name)
     ) +
     theme +
-    theme(legend.position = "right")
+    theme(legend.text = element_text(size = 14), legend.title = element_text(size = 14))
   
 }
 
@@ -130,15 +128,15 @@ for (i in 1:length(SN)){
 
 blank <- grid.rect(gp=gpar(col="white"))
 
-png("Plot/fig3_locstrat.png",height = 11,width = 14, units = 'in',res=600)
+png("Plot/fig3_locstrat.png",height = 11,width = 16, units = 'in',res=800)
 annotate_figure(
   ggarrange(loc_plots[[11]], loc_plots[[12]],loc_plots[[9]],loc_plots[[1]],
             loc_plots[[3]],loc_plots[[14]],loc_plots[[2]], loc_plots[[4]],
             loc_plots[[5]],loc_plots[[7]],loc_plots[[6]], blank,
-            loc_plots[[8]], loc_plots[[13]], loc_plots[[10]],
-            legend = "right",legend.grob = legend, ncol = 4,nrow=4),
-  bottom = text_grob("Mean daily contact", face = "bold", size=17),
-  left = text_grob("Contact location", rot=90, face = "bold", size=17))
+            loc_plots[[8]], loc_plots[[13]], loc_plots[[10]], common.legend = T),
+           # legend = "top",legend.grob = legend, ncol = 4,nrow=4),
+  bottom = text_grob("Mean daily contact", face = "bold", size=14),
+  left = text_grob("Contact location", rot=90, face = "bold", size=14))
 dev.off()
 
 ## Percent reduction in contacts
