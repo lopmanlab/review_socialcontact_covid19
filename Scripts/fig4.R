@@ -6,17 +6,14 @@ stratified <- read_excel("Data/Data.xlsx",sheet = "Strat_change") #Load stratifi
 ## Plot themes
 theme<- theme_classic()+
   theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
-        axis.title.x=element_text(size=8),
-        #axis.title.y = element_text(size-8),
-        #plot.background=element_rect(fill="#f7f7f7"),
-        #panel.background=element_rect(fill="#f7f7f7"),
+        axis.title.x=element_text(size=9),
+        axis.text = element_text(size=11),
         panel.grid.minor=element_blank(),
         panel.grid.major.y=element_blank(),
         panel.grid.major.x=element_line(),
         axis.ticks=element_blank(),
         legend.position="top",
         panel.border=element_blank())
-#theme(axis.text=element_text(size=8))
 
 theme_red <- theme(axis.title.x = element_blank(),
                    axis.title.y = element_blank())
@@ -27,7 +24,7 @@ p <- stratified[stratified$SN==1 & stratified$Strata=="age", ]  %>%
   mutate(measure = factor(measure, levels=c("mean_precovid","mean_lckdown","mean_post","mean_post2"))) %>%
   ggplot() +geom_point(aes(x=mean,y=strata_cat, color=measure), size =3) +
   scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
-                      labels = c("Pre-lockdown","Lockdown","1-month post-lockdown","2+ month post-lockdown"))+
+                      labels = c("Pre-COVID","Lockdown (Spring 2020)","1-month post-relax","2+ month post-relax"))+
 
   theme_bw()+theme(legend.text = element_text(size = 10), legend.title = element_text(size = 10))
 
@@ -97,7 +94,7 @@ for (i in 1:length(SN)){
       # for you
       scale_x_comma(position = "bottom", breaks = seq(0,max,by=4), labels = seq(0,max,by=4),limits = c(0, max)) +
       scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
-                          labels = c("Pre-lockdown","Lockdown","1-month post-lockdown","2+ month post-lockdown"))+
+                          labels = c("Pre-COVID","Lockdown (Spring 2020)","1-month post-relax","2+ month post-relax"))+
       #scale_color_ipsum(name = "A real legend title") +
       labs(
         x = NULL, y = NULL,
@@ -124,7 +121,7 @@ for (i in 1:length(SN)){
 
 
 
-png("Plot/fig4_agestrat.png",height = 11,width = 12, units = 'in',res=600)
+png("Plot/fig4_agestrat.png",height = 11,width = 15, units = 'in',res=700)
 annotate_figure(
           ggarrange(age_plots[[12]], age_plots[[13]],age_plots[[14]],age_plots[[15]],
           age_plots[[5]],age_plots[[2]],age_plots[[3]],age_plots[[16]],
