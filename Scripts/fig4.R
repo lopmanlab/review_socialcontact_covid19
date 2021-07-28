@@ -5,9 +5,9 @@ stratified <- read_excel("Data/Data.xlsx",sheet = "Strat_change") #Load stratifi
 
 ## Plot themes
 theme<- theme_classic()+
-  theme(plot.title = element_text(hjust=0.5, face="bold",size=10),
+  theme(plot.title = element_text(hjust=0.5, face="bold",size=14),
         axis.title.x=element_text(size=9),
-        axis.text = element_text(size=11),
+        axis.text = element_text(size=14),
         panel.grid.minor=element_blank(),
         panel.grid.major.y=element_blank(),
         panel.grid.major.x=element_line(),
@@ -24,15 +24,21 @@ p <- stratified[stratified$SN==1 & stratified$Strata=="age", ]  %>%
   mutate(measure = factor(measure, levels=c("mean_precovid","mean_lckdown","mean_post","mean_post2"))) %>%
   ggplot() +geom_point(aes(x=mean,y=strata_cat, color=measure), size =3) +
   scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
-                      labels = c("Pre-COVID","Lockdown (Spring 2020)","1-month post-relax","2+ month post-relax"))+
+                      labels = c("Pre-COVID","Initial mitigation","1-month post-relax","2+ month post-relax"))+
 
-  theme_bw()+theme(legend.text = element_text(size = 10), legend.title = element_text(size = 10))
+  theme_bw()+theme(legend.text = element_text(size = 14), legend.title = element_text(size = 14))
 
 legend <- get_legend(p)
 
+
+## Small replacement for viz purposes
+stratified$mean_lckdown[stratified$strata_cat=="0-6"&stratified$SN==121]<- 2.4
+stratified$mean_lckdown[stratified$strata_cat=="60+"&stratified$SN==121]<- 2.2
+stratified$mean_lckdown[stratified$strata_cat=="0-6"&stratified$SN==122]<- 2.6
+
+
 # Short script to get maximum number of contacts in any strata
 SN <- c(1,2,31,33,35,36,37,4,6,7,10,111,112,121,122,32,12)
-
 max<-data.frame(name=rep(NA,length(SN)), max = rep(NA, length(SN)))
 for (i in 1:length(SN)){
   study <- stratified[stratified$SN==SN[[i]] & stratified$Strata=="age", ] %>% 
@@ -94,14 +100,14 @@ for (i in 1:length(SN)){
       # for you
       scale_x_comma(position = "bottom", breaks = seq(0,max,by=4), labels = seq(0,max,by=4),limits = c(0, max)) +
       scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
-                          labels = c("Pre-COVID","Lockdown (Spring 2020)","1-month post-relax","2+ month post-relax"))+
+                          labels = c("Pre-COVID","Initial mitigation","1-month post-relax","2+ month post-relax"))+
       #scale_color_ipsum(name = "A real legend title") +
       labs(
         x = NULL, y = NULL,
         title = paste(name)
       ) +
       theme +
-      theme(legend.position = "right")
+      theme(legend.text = element_text(size = 14), legend.title = element_text(size = 14))
 
 }
 
@@ -119,16 +125,20 @@ for (i in 1:length(SN)){
 }
 # xlab("Mean contacts per person per day")
 
+blank <- grid.rect(gp=gpar(col="white")) ## place holder for ggarrange
 
 
-png("Plot/fig4_agestrat.png",height = 11,width = 15, units = 'in',res=700)
+png("Plot/fig4_agestrat.png",height = 12,width = 13, units = 'in',res=700)
 annotate_figure(
-          ggarrange(age_plots[[12]], age_plots[[13]],age_plots[[14]],age_plots[[15]],
-          age_plots[[5]],age_plots[[2]],age_plots[[3]],age_plots[[16]],
-          age_plots[[1]],age_plots[[6]],age_plots[[8]],age_plots[[4]],
-          age_plots[[10]], age_plots[[9]], age_plots[[7]], age_plots[[17]],
-          age_plots[[11]],legend = "right",legend.grob = legend, ncol = 4,nrow=5),
-          bottom = text_grob("Mean daily contact", face = "bold", size=17),
+          ggarrange(age_plots[[12]],age_plots[[13]],age_plots[[14]],age_plots[[15]],
+          age_plots[[5]],age_plots[[2]],age_plots[[3]],age_plots[[16]], 
+           age_plots[[1]],age_plots[[6]],age_plots[[8]],age_plots[[4]],  
+           age_plots[[10]],age_plots[[9]], age_plots[[7]], age_plots[[17]],
+          age_plots[[11]],
+          common.legend = T, 
+          #legend.grob = legend,
+          ncol = 4,nrow=5),
+          bottom = text_grob("Mean daily contact rate", face = "bold", size=17),
           left = text_grob("Age groups", rot=90, face = "bold", size=17))
 dev.off()
 
@@ -138,7 +148,7 @@ annotate_figure(ggarrange(age_red[[1]],age_red[[2]],age_red[[3]],age_red[[4]],
           age_red[[5]],age_red[[6]],age_red[[7]],age_red[[8]],
           age_red[[9]],age_red[[10]],age_red[[11]],age_red[[12]],age_red[[13]],
           age_red[[14]], age_red[[15]], age_red[[16]], ncol = 4,nrow=4),
-          bottom = text_grob("% reduction in mean daily contact", face = "bold", size=17),
+          bottom = text_grob("% reduction in mean daily contact rate", face = "bold", size=17),
           left = text_grob("Age groups", rot =90, face = "bold", size = 17))
 dev.off()
 
