@@ -50,7 +50,7 @@ matrix_viz <- function(df1, part_age= part_age,cont_age=cont_age, fill = "rel", 
 
 ## Import text matrices
 ```{r}
-setwd("C:/Users/cliu369/Box Sync/5.Literature/1.Social contact patterns Lit Review 2020/0_2020rapidreview/Data/9_Zhang/matrix_rds")                                 #Set wd for chunk, not good practice but suffice for now
+
 
 cs_base <- readRDS("changsha_base.RDS")
 cs_lock <- readRDS("changsha_outbreak.RDS")

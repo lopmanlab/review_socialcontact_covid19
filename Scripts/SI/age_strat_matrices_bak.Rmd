@@ -31,13 +31,13 @@ getwd()
 ```
 ## Netherland Backer
 ```{r}
-neth_bac<- read.table(file = '../Data/1_Backer/socialcontact1.tsv', sep = '\t', header = TRUE)
-df <- read.table(file = '../Data/1_Backer/socialcontact2.tsv', sep = '\t', header = TRUE) %>%
+neth_bac<- read.table(file = '../../Data/1_Backer/socialcontact1.tsv', sep = '\t', header = TRUE)
+df <- read.table(file = '../../Data/1_Backer/socialcontact2.tsv', sep = '\t', header = TRUE) %>%
       mutate(part_age = factor(part_age,levels = c("[0,5)","[5,10)","[10,20)","[20,30)","[30,40)","[40,50)","[50,60)","[60,70)","[70,80)","[80,Inf]")),
              cont_age = factor(cont_age, levels =  c("[0,5)","[5,10)","[10,20)","[20,30)","[30,40)","[40,50)","[50,60)","[60,70)","[70,80)","[80,Inf]"))
              )  # factorize participant and contact ages
 
-png("../Data/1_Backer/absolute_change_all.png",width=800, height=600,res=150)
+#png("../Data/1_Backer/absolute_change_all.png",width=800, height=600,res=150)
 df %>% filter(survey=="baseline" & contact_type == "all") %>%
     left_join(df %>% filter(survey=="physical distancing" & contact_type=="all"),
               by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
@@ -49,9 +49,9 @@ df %>% filter(survey=="baseline" & contact_type == "all") %>%
     #scale_fill_gradient2(low = "maroon4", high = "white", mid ="navajowhite2", midpoint = -5, limit =  c(-10,0))+
     xlab("Age of participant")+ylab("Age of contact")+
     geom_tile()+ theme + theme(legend.title = element_text(size = 9))+ ggtitle("Netherlands")
-dev.off()
+#dev.off()
 
-png("../Data/1_Backer/percent_change_all.png",width=800, height=600,res=150)
+#png("../Data/1_Backer/percent_change_all.png",width=800, height=600,res=150)
 df %>% filter(survey=="baseline" & contact_type == "all") %>%
     left_join(df %>% filter(survey=="physical distancing" & contact_type=="all"),
               by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
@@ -60,12 +60,12 @@ df %>% filter(survey=="baseline" & contact_type == "all") %>%
     ggplot(aes(x = part_age, y = cont_age, fill = perc_change)) + theme(legend.position = "bottom") + 
     scale_fill_gradient2(low = "white", high = "#273871", mid = "#7FABD3", midpoint = 0.5, limit = c(0,1))+
     #scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit =  c(-1,1))+
-    xlab("Age of participant")+ylab("Age of contact")+==
+    xlab("Age of participant")+ylab("Age of contact")+
     geom_tile()+ theme
-dev.off()
+#dev.off()
 
 
-png("../Data/1_Backer/absolute_change_community.png",width=800, height=600,res=150)
+#png("../Data/1_Backer/absolute_change_community.png",width=800, height=600,res=150)
 df %>% filter(survey=="baseline" & contact_type == "community") %>%
     left_join(df %>% filter(survey=="physical distancing" & contact_type=="community"),
               by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
@@ -74,9 +74,9 @@ df %>% filter(survey=="baseline" & contact_type == "community") %>%
     scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -5, limit = c(-10,0))+
     xlab("Age of participant")+ylab("Age of contact")+
     geom_tile()+ theme
-dev.off()
+#dev.off()
 
-png("../Data/1_Backer/percent_change_community.png",width=800, height=600,res=150)
+#png("../Data/1_Backer/percent_change_community.png",width=800, height=600,res=150)
 df %>% filter(survey=="baseline" & contact_type == "community") %>%
     left_join(df %>% filter(survey=="physical distancing" & contact_type=="community"),
               by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
@@ -86,9 +86,9 @@ df %>% filter(survey=="baseline" & contact_type == "community") %>%
     scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit =  c(-1,1))+
     xlab("Age of participant")+ylab("Age of contact")+
     geom_tile()+ theme
-dev.off()
+#dev.off()
 
-png("../Data/1_Backer/absolute_change_hh.png",width=800, height=600,res=150)
+#png("../Data/1_Backer/absolute_change_hh.png",width=800, height=600,res=150)
 df %>% filter(survey=="baseline" & contact_type == "household") %>%
     left_join(df %>% filter(survey=="physical distancing" & contact_type=="household"),
               by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
@@ -98,9 +98,9 @@ df %>% filter(survey=="baseline" & contact_type == "household") %>%
     scale_fill_gradient2(low = "#273871", high = "white", mid = "#7FABD3", midpoint = -2.5, limit = c(-5,0.2))+
     xlab("Age of participant")+ylab("Age of contact")+
     geom_tile()+ theme
-dev.off()
+#dev.off()
 
-png("../Data/1_Backer/percent_change_hh.png",width=800, height=600,res=150)
+#png("../Data/1_Backer/percent_change_hh.png",width=800, height=600,res=150)
 df %>% filter(survey=="baseline" & contact_type == "household") %>%
     left_join(df %>% filter(survey=="physical distancing" & contact_type=="household"),
               by=c("part_age" = "part_age", "cont_age" = "cont_age")) %>%
@@ -110,7 +110,7 @@ df %>% filter(survey=="baseline" & contact_type == "household") %>%
     scale_fill_gradient2(low = "maroon4", high ="blue4" , mid ="bisque", midpoint = 0, limit = c(-1,1))+
     xlab("Age of participant")+ylab("Age of contact")+
     geom_tile()+ theme
-dev.off()
+#dev.off()
 
 ```
 # Panel 1

@@ -24,7 +24,6 @@ library(hrbrthemes)
 
 ```{r}
 study <- read_excel("../Data/Data.xlsx",sheet = "Inc_studies")
-res <- read_excel("../Data/Data_origdraft.xlsx", sheet = "Results description")
 meta <- read_excel("../Data/Data.xlsx", sheet = "PreCOV vs Lockdown")
 stratified <- read_excel("../Data/Data.xlsx",sheet = "Strat_change")
 
@@ -40,11 +39,6 @@ study %>% group_by(`Study Design`) %>%summarize(n=n()) %>% mutate(prop = n/sum(n
 study %>% group_by(`Collection Mode`) %>%summarize(n=n()) %>% mutate(prop = n/sum(n))
 
 10/12
-getwd()
-
-                
-
-
 
 stratified
 ```

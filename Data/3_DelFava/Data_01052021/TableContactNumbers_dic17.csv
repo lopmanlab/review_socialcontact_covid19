@@ -1,0 +1,137 @@
+SN,Article,Authors,region_study,name,Variable,Category,Mean,SE,Q50,Q25,Q75
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),age,18-29,3.35858554,0.383745442,3,1,4
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),age,30-39,4.435735421,0.70550115,2.761096528,1,5
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),age,40-49,3.672282803,0.343385354,3,1,4
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),age,50-59,2.852556987,0.413991282,1.720896134,1,3
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),age,60+,1.621667285,0.126871234,1,0,2
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),gender,female,2.579144255,0.150643618,2,1,3
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),gender,male,3.167186298,0.300452548,2,1,4
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),hhsize,1,1.616177549,0.234519716,1,0,2
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),hhsize,2,2.369136653,0.239990926,1,1,3
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),hhsize,3,4.051311382,0.466295371,2,2,4
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),hhsize,4,4.131853859,0.350413475,3,3,5
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),hhsize,5,5.003717438,0.691728317,4,4,6
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),hhsize,6+,1.800507566,0.655732534,1,0,3
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),place,home,1.338383507,0.050718214,1,0,2
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),place,school,0,0,0,0,0
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),place,work,1.084952331,0.156010256,0,0,0
+31,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Belgium_Del,Belgium (Del Fava),place,other,0.658672743,0.049160261,0,0,1
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),age,18-29,2.634491272,0.34621162,1.900388871,1,3
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),age,30-39,3.252868643,0.486507747,3,1,4
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),age,40-49,3.074935287,0.450521471,2,1,4
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),age,50-62,3.080041213,0.370624762,2,1,4
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),age,60+,1.361787824,0.092733016,1,0,2
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),gender,female,2.320165894,0.131776746,1,1,3
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),gender,male,2.21328579,0.235320301,1,0,3
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),hhsize,1,1.320190062,0.234750992,0,0,1
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),hhsize,2,2.284193229,0.196551078,1,1,2
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),hhsize,3,2.758290696,0.22928186,2,2,3
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),hhsize,4,3.464998845,0.251558979,3,3,4
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),hhsize,5,4.235314575,0.571973407,4,4,4
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),hhsize,6+,3.676468459,0.269764478,4,3,4
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),place,home,1.214264524,0.044423793,1,0,2
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),place,school,0,0,0,0,0
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),place,work,0.669828701,0.109125324,0,0,0
+32,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,France_Del,France (Del Fava),place,other,0.469321635,0.039687056,0,0,0
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),age,18-29,4.056212447,0.323812076,3,1,4
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),age,30-39,4.128341508,0.329689417,3,1,5
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),age,40-49,5.096655561,0.383329719,3,1,7
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),age,50-60,4.678857193,0.35599931,3,1,6
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),age,60+,2.491151085,0.154782004,2,1,3.719277155
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),gender,female,3.299906288,0.153318831,2,1,4
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),gender,male,4.15925479,0.206269936,3,1,5
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),hhsize,1,2.378051556,0.185200305,1,0,3
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),hhsize,2,3.474375504,0.180657895,2,1,4
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),hhsize,3,5.702815683,0.455368701,3,2,7
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),hhsize,4,5.574669793,0.395178171,4,3,6
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),hhsize,5,5.664018395,0.567615441,4,4,6
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),hhsize,6+,3.607016111,0.72350443,3,3,4
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),place,home,1.394542295,0.03123804,1,1,2
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),place,school,0,0,0,0,0
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),place,work,1.422004316,0.10294219,0,0,0
+33,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Germany_Del,Germany (Del Fava),place,other,1.061795825,0.044201203,0,0,2
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,age,18-29,3.356113275,0.536281241,3,2,4
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,age,30-39,3.067815226,0.404704787,2,1,3
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,age,40-49,2.71907641,0.251937656,2,1,3.008106704
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,age,50-61,3.302436438,0.384827342,2,1,4
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,age,60+,1.6161653,0.124680753,1,0,2
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,gender,female,2.469102109,0.129846227,2,1,3
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,gender,male,2.819243089,0.295949098,2,1,3
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,hhsize,1,1.104408018,0.189087467,0,0,1
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,hhsize,2,2.177242482,0.173132086,1,1,2
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,hhsize,3,3.564064724,0.461683468,2,2,3
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,hhsize,4,3.967339866,0.262501513,3,3,4
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,hhsize,5,4.306563031,0.544678917,4,3,4
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,hhsize,6+,2.967538297,0.456261872,3,2,3
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,place,home,1.614452738,0.058055062,1,1,3
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,place,school,0,0,0,0,0
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,place,work,0.74589418,0.139922533,0,0,0
+34,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Spain,Spain,place,other,0.489089586,0.043490919,0,0,0
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),age,18-29,3.102544226,0.152035866,3,2,4
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),age,30-39,3.166841244,0.310910148,2,1,4
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),age,40-49,3.099521563,0.304457324,2,1,4
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),age,50-63,2.736042448,0.273165889,2,1,3
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),age,60+,1.707256477,0.163915492,1,0,2
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),gender,female,2.40671154,0.106863289,2,1,3
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),gender,male,2.814423358,0.183952266,2,1,4
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),hhsize,1,1.560004496,0.180108351,1,0,2
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),hhsize,2,2.235373509,0.154060846,1,1,3
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),hhsize,3,3.228373143,0.23407906,2,2,3
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),hhsize,4,3.716977316,0.30293214,3,3,4
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),hhsize,5,4.206084437,0.47228507,4,3,5
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),hhsize,6+,0.845783759,0.771040208,0,0,0
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),place,home,1.54975351,0.043882585,1,1,2
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),place,school,0,0,0,0,0
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),place,work,0.550195121,0.072984712,0,0,0
+35,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Italy_Del,Italy (Del Fava),place,other,0.549177846,0.039344594,0,0,1
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),age,18-29,5.319943306,0.420867092,3,2,6
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),age,30-39,3.941096093,0.449185535,2,1,4
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),age,40-49,5.102211734,0.384655479,4,2,6
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),age,50-64,5.289122249,0.364300965,3,2,7
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),age,60+,2.781616697,0.15328,2,1,4
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),gender,female,3.950861512,0.162854976,3,1,5
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),gender,male,4.559075811,0.259163741,3,1,6
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),hhsize,1,2.977711489,0.285564701,1,0,3
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),hhsize,2,3.685851061,0.201694204,2,1,4
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),hhsize,3,5.057361163,0.416496054,3,2,6
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),hhsize,4,5.805288954,0.327940667,4,3,7
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),hhsize,5,6.382204385,0.867002517,4,4,7
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),hhsize,6+,7.957338077,3.443658647,3,1,9
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),place,home,1.594602473,0.037777557,1,1,3
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),place,school,0,0,0,0,0
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),place,work,1.920644962,0.126694764,0,0,0
+36,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,Netherlands_Del,Netherlands (Del Fava),place,other,0.941042479,0.04151944,0,0,2
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),age,18-29,2.877031891,0.298635479,2,1,3
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),age,30-39,2.910971029,0.268653537,3,1,4
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),age,40-49,2.658947106,0.266463442,2,1,3.261414749
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),age,50-65,3.085060724,0.272304637,2,1,4
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),age,60+,1.834798275,0.119584768,1,1,2
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),gender,female,2.521698251,0.127929448,2,1,3
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),gender,male,2.498591346,0.163397687,2,1,3
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),hhsize,1,1.442992456,0.183736963,1,0,2
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),hhsize,2,2.067609152,0.14494937,1,1,2
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),hhsize,3,3.280161847,0.261939026,3,2,3
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),hhsize,4,3.812062782,0.294060591,3,3,4
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),hhsize,5,4.599398489,0.457350452,4,4,4
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),hhsize,6+,2.079149416,1.34169336,0,0,3
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),place,home,1.477957559,0.044242424,1,1,2
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),place,school,0,0,0,0,0
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),place,work,0.571235074,0.088182158,0,0,0
+37,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,UK_Del,UK (Del Fava),place,other,0.579371687,0.042678463,0,0,1
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),age,18-29,3.820095037,0.367079699,2,1,4
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),age,30-39,4.255989719,0.374763148,3,1,5
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),age,40-49,4.066240483,0.35789861,3,1,4
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),age,50-66,3.930221693,0.25147128,2.04397176,1,5
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),age,60+,2.596039587,0.10867513,2,1,3
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),gender,female,3.312347565,0.113315919,2,1,4
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),gender,male,3.934557612,0.265777813,2,1,4.588350505
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),hhsize,1,2.206993229,0.224540724,1,0,3
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),hhsize,2,3.371448852,0.213808919,2,1,4
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),hhsize,3,4.096373389,0.296699314,3,2,5
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),hhsize,4,4.893216256,0.281040069,3,3,5
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),hhsize,5,5.159516491,0.426068518,4,4,5
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),hhsize,6+,2.71842013,0.655844394,2,0,4
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),place,home,1.569645034,0.028796468,1,1,2
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),place,school,0,0,0,0,0
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),place,work,1.296318255,0.107968698,0,0,0
+38,The differential impact of physical distancing strategies on social contacts relevant for the spread of COVID-19,Del fava et al,US_Del,US (Del Fava),place,other,0.777495042,0.032702161,0,0,1

@@ -25,11 +25,11 @@ library(scales)
 
 #Data
 #Lockdown data
-uk_lock <- readRDS("../Data/5_Jarvis/comix_covid-19-first_wave/data/contact_matrices/h2020_survey.rds")
+uk_lock <- readRDS("../../Data/5_Jarvis/comix_covid-19-first_wave/data/contact_matrices/h2020_survey.rds")
 
 #Baseline POLYMOD data
-cont <- readRDS("../Data/5_Jarvis/comix_covid-19-first_wave/data/polymod_contacts.rds")
-part <- readRDS("../Data/5_Jarvis/comix_covid-19-first_wave/data/polymod_participants.rds")
+cont <- readRDS("../../Data/5_Jarvis/comix_covid-19-first_wave/data/polymod_contacts.rds")
+part <- readRDS("../../Data/5_Jarvis/comix_covid-19-first_wave/data/polymod_participants.rds")
 
 #function for filtering for lockdown data
 source('cm_filter.R')

@@ -22,8 +22,8 @@ theme<-theme_classic()+
 ## Read in data
 For age-specific matrices for France, we note that while Bosetti et al paper presents stratified results by setting, they presented age-specific matrices among reported contacts 
 ```{r}
-lock_m <- read.csv("../Data/11_Bosetti/Matrices_LD_France/ALLcontacts_LD.csv") ## all contacts
-pop_age <- read.csv("../Data/11_Bosetti/pyramide-des-ages-2020.csv")
+lock_m <- read.csv("../../Data/11_Bosetti/Matrices_LD_France/ALLcontacts_LD.csv") ## all contacts
+pop_age <- read.csv("../../Data/11_Bosetti/pyramide-des-ages-2020.csv")
 part_age <- pop_age %>% group_by(part_age) %>% summarize(pop_age=sum(Total)) %>% mutate(part_age_weight = pop_age/sum(pop_age)) %>% select(part_age,part_age_weight)
 
 colnames(lock_m) <- c("classe_age","0-10","11-20","[21,31)","[31,41)","[41,51)","[51,61)","[61,71)","[71,81)","81+")
@@ -75,8 +75,7 @@ df3 <- melt(mr3, varnames = c("age1", "age2"), value.name = "contacts")  %>% lef
                data.frame(age1 = c(1,2,3,4,5,6,7),
                           age1_cat = as.factor(c("[21,31)","[31,41)","[41,51)","[51,61)","[61,71)","[71,81)","81+"))))
 
-lock_new
-mr3
+
 
 ```
 

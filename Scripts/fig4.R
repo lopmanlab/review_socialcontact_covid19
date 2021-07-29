@@ -99,7 +99,8 @@ for (i in 1:length(SN)){
       # i just extended the scale a bit + put axis on top; choose aesthetics that work 
       # for you
       scale_x_comma(position = "bottom", breaks = seq(0,max,by=4), labels = seq(0,max,by=4),limits = c(0, max)) +
-      scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
+      #scale_colour_manual(values = c("#2171B5","black","grey60","#C6DBEF"), name = "Mean contact",
+      scale_colour_manual(values = c("gray42","black","grey60","gray85"), name = "Mean contact",
                           labels = c("Pre-COVID","Initial mitigation","1-month post-relax","2+ month post-relax"))+
       #scale_color_ipsum(name = "A real legend title") +
       labs(
@@ -128,7 +129,7 @@ for (i in 1:length(SN)){
 blank <- grid.rect(gp=gpar(col="white")) ## place holder for ggarrange
 
 
-png("Plot/fig4_agestrat.png",height = 12,width = 13, units = 'in',res=700)
+png("Plot/fig4_agestrat_gray.png",height = 12,width = 13, units = 'in',res=700)
 annotate_figure(
           ggarrange(age_plots[[12]],age_plots[[13]],age_plots[[14]],age_plots[[15]],
           age_plots[[5]],age_plots[[2]],age_plots[[3]],age_plots[[16]], 

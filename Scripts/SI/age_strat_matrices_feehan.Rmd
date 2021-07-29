@@ -8,8 +8,8 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-df <- read.csv("../Data/4_Feehan/contact_rel_change.csv")
-kenya <- read.csv("../Data/7_Quaife/contact_data_overall.csv")
+df <- read.csv("../../Data/4_Feehan/contact_rel_change.csv")
+kenya <- read.csv("../../Data/7_Quaife/contact_data_overall.csv")
 
 
 #Theme for ggplot

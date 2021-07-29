@@ -1,0 +1,57 @@
+source,country,country_code,type,week,age,contacts,low,high
+CHBS,Belgium,BE,overall,W14,18-24,3.55,2.93,4.16
+CHBS,Belgium,BE,overall,W14,25-44,3.13,2.55,3.7
+CHBS,Belgium,BE,overall,W14,45-64,2.57,2.18,2.95
+CHBS,Belgium,BE,overall,W14,65+,2.49,1.94,3.05
+CHBS,France,FR,overall,W13,18-24,2.32,1.86,2.78
+CHBS,France,FR,overall,W13,25-44,2.03,1.69,2.36
+CHBS,France,FR,overall,W13,45-64,2.67,2.34,3.01
+CHBS,France,FR,overall,W13,65+,2.25,1.86,2.63
+CHBS,France,FR,overall,W14,18-24,2.07,1.8,2.35
+CHBS,France,FR,overall,W14,25-44,2.58,2.22,2.94
+CHBS,France,FR,overall,W14,45-64,2.58,2.22,2.95
+CHBS,France,FR,overall,W14,65+,2.34,1.86,2.82
+CHBS,Germany,DE,overall,W13,18-24,4.16,3.61,4.71
+CHBS,Germany,DE,overall,W13,25-44,4.12,3.67,4.58
+CHBS,Germany,DE,overall,W13,45-64,4.04,3.66,4.43
+CHBS,Germany,DE,overall,W13,65+,3.74,3.24,4.24
+CHBS,Germany,DE,overall,W14,18-24,4.52,4.03,5
+CHBS,Germany,DE,overall,W14,25-44,4.49,4.13,4.84
+CHBS,Germany,DE,overall,W14,45-64,3.77,3.42,4.11
+CHBS,Germany,DE,overall,W14,65+,3.64,3.13,4.16
+CHBS,Italy,IT,overall,W13,18-24,2.96,2.55,3.36
+CHBS,Italy,IT,overall,W13,25-44,2.92,2.65,3.19
+CHBS,Italy,IT,overall,W13,45-64,2.41,2.19,2.63
+CHBS,Italy,IT,overall,W13,65+,2.03,1.66,2.4
+CHBS,Italy,IT,overall,W14,18-24,2.78,2.5,3.07
+CHBS,Italy,IT,overall,W14,25-44,2.77,2.45,3.1
+CHBS,Italy,IT,overall,W14,45-64,2.23,1.91,2.55
+CHBS,Italy,IT,overall,W14,65+,2.08,1.67,2.49
+CHBS,Netherlands,NL,overall,W14,18-24,4.22,3.58,4.86
+CHBS,Netherlands,NL,overall,W14,25-44,3.89,3.34,4.44
+CHBS,Netherlands,NL,overall,W14,45-64,4.14,3.7,4.58
+CHBS,Netherlands,NL,overall,W14,65+,3.73,3.04,4.42
+CHBS,Spain,ES,overall,W13,18-24,3.01,2.38,3.64
+CHBS,Spain,ES,overall,W13,25-44,2.63,2.2,3.05
+CHBS,Spain,ES,overall,W13,45-64,2.92,2.6,3.23
+CHBS,Spain,ES,overall,W13,65+,2.82,2.33,3.31
+CHBS,Spain,ES,overall,W14,18-24,3.04,2.47,3.62
+CHBS,Spain,ES,overall,W14,25-44,2.7,2.33,3.06
+CHBS,Spain,ES,overall,W14,45-64,2.57,2.32,2.83
+CHBS,Spain,ES,overall,W14,65+,2.63,2.23,3.03
+CHBS,United Kingdom,GB,overall,W13,18-24,3.77,2.93,4.62
+CHBS,United Kingdom,GB,overall,W13,25-44,2.97,2.65,3.29
+CHBS,United Kingdom,GB,overall,W13,45-64,3.1,2.85,3.35
+CHBS,United Kingdom,GB,overall,W13,65+,2.8,2.47,3.14
+CHBS,United Kingdom,GB,overall,W14,18-24,2.22,1.74,2.69
+CHBS,United Kingdom,GB,overall,W14,25-44,2.2,1.91,2.49
+CHBS,United Kingdom,GB,overall,W14,45-64,2.57,2.26,2.88
+CHBS,United Kingdom,GB,overall,W14,65+,2.34,2.02,2.66
+CHBS,United States,US,overall,W13,18-24,3.81,3.16,4.46
+CHBS,United States,US,overall,W13,25-44,3.83,3.42,4.24
+CHBS,United States,US,overall,W13,45-64,3.62,3.35,3.9
+CHBS,United States,US,overall,W13,65+,3.39,3.08,3.7
+CHBS,United States,US,overall,W14,18-24,2.85,2.41,3.28
+CHBS,United States,US,overall,W14,25-44,3.67,3.23,4.11
+CHBS,United States,US,overall,W14,45-64,3.7,3.36,4.04
+CHBS,United States,US,overall,W14,65+,3.22,2.91,3.53
