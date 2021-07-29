@@ -16,3 +16,6 @@ Liu CY, Berlin J, Kiti MC, Del Fava E, Grow A, Zagheni E, Melegaro A, Jenness SM
 *Changes in contact rates pre-COVID (dark blue), during initial mitigation measures in spring 2020 (black), 1-month post first relaxation of mitigation measures (gray) and 2+ months post first relaxation (light blue), stratified by age group. Estimates during COVID-19 were extracted from studies, estimates pre-COVID were either extracted from studies or from SOCRATES24. No initial mitigation data was available for South Africa. X-axis limits for Shanghai, Italy, Netherlands (Backer), Luxembourg and Greece were increased to capture larger pre-COVID contact rates.*  
 
 ![alt text](https://github.com/lopmanlab/review_socialcontact_covid19/blob/main/Plot/fig4_agestrat.png)
+
+## Code
+All analysis and figure codes can be found [here](https://github.com/lopmanlab/review_socialcontact_covid19/tree/main/Scripts) 
